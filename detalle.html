@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ficha de Bestia</title>
+    <style>
+      :root{
+        --bg:#f4f6f8; --surface:#fff; --text:#111827; --muted:#6b7280; --border:#e5e7eb;
+      }
+      body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+      .wrap{max-width:980px;margin:0 auto;padding:20px}
+      .top{
+        display:flex;align-items:center;justify-content:space-between;margin-bottom:16px
+      }
+      .back{display:inline-block;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;text-decoration:none;color:#111827}
+      .card{
+        background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden
+      }
+      .head{display:grid;grid-template-columns: 240px 1fr;gap:16px;padding:16px;border-bottom:1px solid var(--border)}
+      .img{width:100%;height:100%;max-height:220px;object-fit:cover;border-radius:12px;background:#f1f5f9}
+      .name{font-size:1.6rem;font-weight:800;margin:0}
+      .badge{display:inline-block;margin-top:8px;padding:6px 10px;border-radius:999px;border:1px solid #e5e7eb;font-weight:700}
+      .body{padding:16px}
+      .grid{display:grid;grid-template-columns: repeat(3, 1fr);gap:12px}
+      .stat{background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:10px}
+      .stat b{display:block;color:var(--muted);font-size:.8rem;margin-bottom:4px}
+      .section{margin-top:16px}
+      @media (max-width: 720px){
+        .head{grid-template-columns: 1fr}
+        .grid{grid-template-columns: 1fr 1fr}
+      }
+      @media (max-width: 480px){
+        .grid{grid-template-columns: 1fr}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="top">
+        <a class="back" href="index.html">← Volver</a>
+        <strong>Ficha de bestia</strong>
+      </div>
+      <article class="card" id="card">
+        <div class="head">
+          <img class="img" id="img" alt="" />
+          <div>
+            <h1 class="name" id="name"></h1>
+            <span class="badge" id="cat"></span>
+          </div>
+        </div>
+        <div class="body">
+          <div class="grid">
+            <div class="stat"><b>Daño</b><span id="dano"></span></div>
+            <div class="stat"><b>C.A.</b><span id="ca"></span></div>
+            <div class="stat"><b>Vitalidad</b><span id="vitalidad"></span></div>
+            <div class="stat"><b>PX</b><span id="px"></span></div>
+            <div class="stat"><b>Movimiento</b><span id="movimiento"></span></div>
+            <div class="stat"><b>Rango alcance</b><span id="alcance"></span></div>
+          </div>
+          <div class="section stat"><b>Fortalezas</b><div id="fortalezas"></div></div>
+          <div class="section stat"><b>Debilidades</b><div id="debilidades"></div></div>
+          <div class="section stat"><b>Localización</b><div id="localizacion"></div></div>
+          <div class="section stat"><b>Alineamiento</b><div id="alineamiento"></div></div>
+          <div class="section stat"><b>Descripción</b><div id="descripcion"></div></div>
+        </div>
+      </article>
+    </div>
+    <script src="data.js"></script>
+    <script>
+      function norm(s){
+        return String(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      }
+      function slugify(s){
+        return norm(s).replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+      }
+      function items(s){
+        return String(s||'').split(/[.\n;•]+/).map(t=>t.trim()).filter(Boolean);
+      }
+      const params = new URLSearchParams(location.search);
+      const id = params.get('id');
+      const list = Array.isArray(window.bestias) ? window.bestias : JSON.parse(localStorage.getItem('bestias')||'[]');
+      const item = list.find(b => slugify(b.nombre) === id);
+      if(!item){
+        document.getElementById('name').textContent = 'Bestia no encontrada';
+      } else {
+        document.getElementById('img').src = item.imagen || '';
+        document.getElementById('img').alt = item.nombre || '';
+        document.getElementById('name').textContent = item.nombre || '';
+        document.getElementById('cat').textContent = item.categoria || '';
+        document.getElementById('dano').textContent = item.dano_texto ?? (item.dano ?? '-');
+        document.getElementById('ca').textContent = item.ca ?? '-';
+        document.getElementById('vitalidad').textContent = item.vitalidad ?? '-';
+        document.getElementById('px').textContent = item.px ?? '-';
+        document.getElementById('movimiento').textContent = item.movimiento ?? '-';
+        document.getElementById('alcance').textContent = item.dano_alcance ?? '-';
+        const fortEl = document.getElementById('fortalezas');
+        fortEl.innerHTML = '';
+        const fortUl = document.createElement('ul');
+        for(const p of items(item.fortalezas)) { const li=document.createElement('li'); li.textContent=p; fortUl.appendChild(li); }
+        fortEl.appendChild(fortUl);
+        const debEl = document.getElementById('debilidades');
+        debEl.innerHTML = '';
+        const debUl = document.createElement('ul');
+        for(const p of items(item.debilidades)) { const li=document.createElement('li'); li.textContent=p; debUl.appendChild(li); }
+        debEl.appendChild(debUl);
+        document.getElementById('localizacion').textContent = item.localizacion ?? '';
+        document.getElementById('alineamiento').textContent = item.alineamiento ?? '';
+        document.getElementById('descripcion').textContent = item.descripcion ?? '';
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Búsqueda Avanzada</title>
+    <style>
+      :root{ --bg:#f4f6f8; --surface:#fff; --text:#111827; --muted:#6b7280; --border:#e5e7eb; }
+      body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+      .wrap{max-width:900px;margin:0 auto;padding:20px}
+      .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+      .back{display:inline-block;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;text-decoration:none;color:#111827}
+      .panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px}
+      .questions{display:flex;flex-direction:column;gap:14px}
+      .question{display:flex;flex-direction:column;gap:6px}
+      .question label{font-weight:700}
+      .hint{color:var(--muted);font-size:.85rem}
+      .input, .select, .num, .btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+      .btn{font-weight:700;cursor:pointer}
+      .radio-group{display:flex;flex-direction:column;gap:6px}
+      .cards{display:grid;grid-template-columns: repeat(3, minmax(280px, 1fr));gap:16px}
+      .card{background:#fff;border:1px solid var(--border);border-radius:16px;cursor:pointer}
+      .card-header{display:grid;grid-template-columns:100px 1fr;gap:12px;padding:12px;border-bottom:1px solid var(--border)}
+      .img{width:100%;height:100%;max-height:84px;object-fit:cover;border-radius:10px;background:#f1f5f9}
+      .name{font-weight:800}
+      @media (max-width:1024px){ .cards{grid-template-columns: repeat(2, minmax(240px, 1fr))} }
+      @media (max-width:640px){ .cards{grid-template-columns: 1fr} }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="top">
+        <a class="back" href="index.html">← Volver</a>
+        <strong>Búsqueda avanzada</strong>
+      </div>
+      <div class="panel">
+        <div class="questions">
+          <div class="question">
+            <label for="searchInput">Nombre</label>
+            <div class="hint">Escribe para filtrar por nombre en tiempo real</div>
+            <input id="searchInput" class="input" type="search" placeholder="Ej.: Serpopardo" />
+          </div>
+
+          <div class="question">
+            <label>Categoría</label>
+            <div class="hint">Selecciona una categoría o deja “Todas”</div>
+            <div class="radio-group" id="catGroup">
+              <label><input type="radio" name="categoria" value="Todas" checked /> Todas</label>
+              <label><input type="radio" name="categoria" value="Categoría 1" /> Categoría 1</label>
+              <label><input type="radio" name="categoria" value="Categoría 2" /> Categoría 2</label>
+              <label><input type="radio" name="categoria" value="Categoría 3" /> Categoría 3</label>
+              <label><input type="radio" name="categoria" value="Categoría 4" /> Categoría 4</label>
+            </div>
+          </div>
+
+          <div class="question">
+            <label>Daño</label>
+            <div class="hint">Rango opcional</div>
+            <div style="display:flex;gap:8px">
+              <input id="f_dano_min" class="num" type="number" placeholder="min" />
+              <input id="f_dano_max" class="num" type="number" placeholder="max" />
+            </div>
+          </div>
+
+          <div class="question">
+            <label>Vitalidad</label>
+            <div class="hint">Rango opcional</div>
+            <div style="display:flex;gap:8px">
+              <input id="f_vitalidad_min" class="num" type="number" placeholder="min" />
+              <input id="f_vitalidad_max" class="num" type="number" placeholder="max" />
+            </div>
+          </div>
+
+          <div class="question">
+            <label>PX</label>
+            <div class="hint">Rango opcional</div>
+            <div style="display:flex;gap:8px">
+              <input id="f_px_min" class="num" type="number" placeholder="min" />
+              <input id="f_px_max" class="num" type="number" placeholder="max" />
+            </div>
+          </div>
+
+          <div class="question">
+            <label>Movimiento</label>
+            <div class="hint">Rango opcional</div>
+            <div style="display:flex;gap:8px">
+              <input id="f_mov_min" class="num" type="number" placeholder="min" />
+              <input id="f_mov_max" class="num" type="number" placeholder="max" />
+            </div>
+          </div>
+
+          <div class="question">
+            <label>Rango alcance</label>
+            <div class="hint">Rango opcional</div>
+            <div style="display:flex;gap:8px">
+              <input id="f_alc_min" class="num" type="number" placeholder="min" />
+              <input id="f_alc_max" class="num" type="number" placeholder="max" />
+            </div>
+          </div>
+
+          <div class="question">
+            <label>Ordenar</label>
+            <div class="hint">Selecciona atributo y dirección</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <select id="sortAttr" class="select">
+                <option value="">Ordenar por…</option>
+                <option value="nombre">Nombre</option>
+                <option value="dano">Daño</option>
+                <option value="ca">C.A.</option>
+                <option value="vitalidad">Vitalidad</option>
+                <option value="px">PX</option>
+                <option value="movimiento">Movimiento</option>
+                <option value="dano_alcance">Rango alcance</option>
+              </select>
+              <select id="sortDir" class="select">
+                <option value="asc">Ascendente</option>
+                <option value="desc">Descendente</option>
+              </select>
+              <button id="clearBtn" class="btn">Limpiar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin:12px 0;color:var(--muted)">
+        <span id="resultCount">0 resultados</span>
+      </div>
+      <div class="cards" id="cards"></div>
+    </div>
+    <script src="data.js"></script>
+    <script>
+      function norm(s){return String(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
+      function slugify(s){return norm(s).replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')}
+      const list = Array.isArray(window.bestias) ? window.bestias : JSON.parse(localStorage.getItem('bestias')||'[]');
+      const cardsEl = document.getElementById('cards');
+      const resultCountEl = document.getElementById('resultCount');
+      const searchInput = document.getElementById('searchInput');
+      const sortAttr = document.getElementById('sortAttr');
+      const sortDir = document.getElementById('sortDir');
+      const clearBtn = document.getElementById('clearBtn');
+      let currentCategory = 'Todas';
+      const catGroup = document.getElementById('catGroup');
+      const filters = {
+        dano: {min: document.getElementById('f_dano_min'), max: document.getElementById('f_dano_max')},
+        vitalidad: {min: document.getElementById('f_vitalidad_min'), max: document.getElementById('f_vitalidad_max')},
+        px: {min: document.getElementById('f_px_min'), max: document.getElementById('f_px_max')},
+        movimiento: {min: document.getElementById('f_mov_min'), max: document.getElementById('f_mov_max')},
+        dano_alcance: {min: document.getElementById('f_alc_min'), max: document.getElementById('f_alc_max')}
+      };
+      const attrMap = {nombre:'nombre',dano:'dano',ca:'ca',vitalidad:'vitalidad',px:'px',movimiento:'movimiento',dano_alcance:'dano_alcance'};
+      function num(val){
+        const s = String(val ?? '').trim();
+        if (s === '') return null;
+        const n = Number(s);
+        return Number.isFinite(n) ? n : null;
+      }
+      function pasaRango(value,minEl,maxEl){
+        const v = Number(value);
+        if (!Number.isFinite(v)) return true;
+        const mn = num(minEl.value);
+        const mx = num(maxEl.value);
+        if (mn !== null && v < mn) return false;
+        if (mx !== null && v > mx) return false;
+        return true;
+      }
+      function filtrar(lista){
+        const q = (searchInput.value||'').trim().toLowerCase();
+        return lista.filter(b=>{
+          if(q && !(b.nombre||'').toLowerCase().includes(q)) return false;
+          if (String(currentCategory).toLowerCase() !== 'todas') {
+            if ((b.categoria||'').toLowerCase() !== (currentCategory||'').toLowerCase()) return false;
+          }
+          if(!pasaRango(b.dano,filters.dano.min,filters.dano.max)) return false;
+          if(!pasaRango(b.vitalidad,filters.vitalidad.min,filters.vitalidad.max)) return false;
+          if(!pasaRango(b.px,filters.px.min,filters.px.max)) return false;
+          if(!pasaRango(b.movimiento,filters.movimiento.min,filters.movimiento.max)) return false;
+          if(!pasaRango(b.dano_alcance,filters.dano_alcance.min,filters.dano_alcance.max)) return false;
+          return true;
+        });
+      }
+      function ordenar(lista){
+        const key = attrMap[sortAttr.value]; const dir = sortDir.value==='desc'?-1:1;
+        if(!key) return lista;
+        return [...lista].sort((a,b)=>{
+          const va=a[key], vb=b[key];
+          if(typeof va==='number' && typeof vb==='number') return (va-vb)*dir;
+          const sa=String(va??'').toLowerCase(); const sb=String(vb??'').toLowerCase();
+          if(sa<sb) return -1*dir; if(sa>sb) return 1*dir; return 0;
+        });
+      }
+      function crearCard(b){
+        const el = document.createElement('article');
+        el.className = 'card';
+        const header = document.createElement('div');
+        header.className = 'card-header';
+        const img = document.createElement('img');
+        img.className = 'img';
+        img.src = b.imagen || '';
+        img.alt = b.nombre || '';
+        const right = document.createElement('div');
+        const nm = document.createElement('div');
+        nm.className = 'name';
+        nm.textContent = b.nombre || '';
+        const cat = document.createElement('div');
+        cat.style.color = '#6b7280';
+        cat.textContent = b.categoria || '';
+        right.appendChild(nm);
+        right.appendChild(cat);
+        header.appendChild(img);
+        header.appendChild(right);
+        el.appendChild(header);
+        el.addEventListener('click', ()=>{
+          const slug = slugify(b.nombre);
+          if (!slug) return;
+          location.href = 'detalle.html?id=' + encodeURIComponent(slug);
+        });
+        return el;
+      }
+      function render(){
+        cardsEl.innerHTML='';
+        const filtradas=filtrar(list);
+        const ordenadas=ordenar(filtradas);
+        resultCountEl.textContent = String(ordenadas.length) + ' resultado' + (ordenadas.length!==1?'s':'');
+        for(const b of ordenadas){ cardsEl.appendChild(crearCard(b)); }
+      }
+      searchInput.addEventListener('input',render);
+      sortAttr.addEventListener('change',render);
+      sortDir.addEventListener('change',render);
+      catGroup.addEventListener('change', function(e){
+        const tgt = e.target;
+        if (tgt && tgt.name === 'categoria') {
+          currentCategory = tgt.value || 'Todas';
+          render();
+        }
+      });
+      clearBtn.addEventListener('click',()=>{
+        searchInput.value=''; sortAttr.value=''; sortDir.value='asc';
+        for(const k of Object.keys(filters)){ filters[k].min.value=''; filters[k].max.value=''; }
+        currentCategory = 'Todas';
+        const radios = catGroup.querySelectorAll('input[name="categoria"]');
+        if (radios.length) { radios[0].checked = true; }
+        render();
+      });
+      for(const k of Object.keys(filters)){
+        filters[k].min.addEventListener('input',render);
+        filters[k].max.addEventListener('input',render);
+      }
+      render();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bestias | Organizador y Buscador</title>
+    <style>
+      :root{
+        --bg: #f4f6f8;
+        --surface: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --primary: #2563eb;
+        --border: #e5e7eb;
+        --shadow: 0 8px 20px rgba(0,0,0,0.06);
+        /* Colores por categoría (suaves) */
+        --cat1-bg: #e0f2fe; --cat1-fg: #075985;
+        --cat2-bg: #fef3c7; --cat2-fg: #854d0e;
+        --cat3-bg: #e9d5ff; --cat3-fg: #6b21a8;
+        --cat4-bg: #dcfce7; --cat4-fg: #166534;
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0;
+        background:var(--bg);
+        color:var(--text);
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+      }
+
+      .app{
+        display:grid;
+        grid-template-columns: 260px 1fr;
+        min-height:100dvh;
+      }
+      aside.sidebar{
+        background:var(--surface);
+        border-right:1px solid var(--border);
+        padding:20px;
+      }
+      .brand{
+        font-weight:700;
+        font-size:1.2rem;
+        margin-bottom:12px;
+      }
+      .cat-list{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+      }
+      .cat-btn{
+        appearance:none;
+        border:1px solid var(--border);
+        background:#fff;
+        padding:10px 12px;
+        border-radius:10px;
+        text-align:left;
+        cursor:pointer;
+        font-weight:600;
+        transition: border-color .2s, box-shadow .2s, transform .04s;
+      }
+      .cat-btn:hover{border-color:#cbd5e1}
+      .cat-btn.active{
+        border-color:#a3bffa;
+        box-shadow:0 0 0 3px rgba(37,99,235,0.15);
+      }
+      .cat-hint{color:var(--muted); font-size:.9rem; margin-top:8px}
+
+      main.content{
+        padding:20px;
+      }
+      .toolbar{
+        display:flex;
+        gap:12px;
+        flex-wrap:wrap;
+        align-items:center;
+        margin-bottom:12px;
+      }
+      .search{
+        flex:1 1 260px;
+        display:flex;
+        align-items:center;
+        gap:8px;
+        background:var(--surface);
+        border:1px solid var(--border);
+        border-radius:10px;
+        padding:10px 12px;
+      }
+      .search input{
+        flex:1;
+        border:none;
+        outline:none;
+        font-size:1rem;
+        background:transparent;
+      }
+      .sel, .btn, .num{
+        background:var(--surface);
+        border:1px solid var(--border);
+        border-radius:10px;
+        padding:10px 12px;
+        font-size: .95rem;
+      }
+      .btn{
+        cursor:pointer;
+        font-weight:600;
+      }
+      .btn.primary{
+        background:#eef2ff;
+        border-color:#c7d2fe;
+        color:#3730a3;
+      }
+      .filters{
+        background:var(--surface);
+        border:1px solid var(--border);
+        border-radius:12px;
+        padding:10px 12px;
+      }
+      .filters summary{cursor:pointer; font-weight:700}
+      .filters-grid{
+        display:grid;
+        grid-template-columns: repeat(5, minmax(160px,1fr));
+        gap:12px;
+        margin-top:10px;
+      }
+      .filters-field{
+        display:grid;
+        grid-template-columns: 1fr 1fr;
+        gap:8px;
+      }
+      .filters label{font-size:.85rem; color:var(--muted)}
+
+      .results-bar{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        margin:14px 0;
+        color:var(--muted);
+        font-size:.95rem;
+      }
+
+      .cards{
+        display:grid;
+        grid-template-columns: repeat(3, minmax(280px, 1fr));
+        gap:16px;
+      }
+
+      .card{
+        background:var(--surface);
+        border:1px solid var(--border);
+        border-radius:16px;
+        box-shadow: var(--shadow);
+        overflow:hidden;
+        transition: box-shadow .2s, transform .04s;
+        cursor:pointer;
+      }
+      .card:hover{box-shadow:0 12px 28px rgba(0,0,0,0.10)}
+      .card-header{
+        display:grid;
+        grid-template-columns: 120px 1fr;
+        gap:12px;
+        padding:12px;
+        border-bottom:1px solid var(--border);
+        align-items:center;
+      }
+      .card-img{
+        width:100%;
+        height:100%;
+        max-height:96px;
+        object-fit:cover;
+        border-radius:10px;
+        background:#f1f5f9;
+      }
+      .card-title{
+        display:flex;
+        flex-direction:column;
+        gap:6px;
+      }
+      .name{
+        font-weight:800;
+        font-size:1.05rem;
+      }
+      .badge{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        font-size:.85rem;
+        font-weight:700;
+        width:max-content;
+        padding:6px 10px;
+        border-radius:999px;
+        border:1px solid transparent;
+      }
+      .badge.cat1{ background:var(--cat1-bg); color:var(--cat1-fg); border-color:#bae6fd }
+      .badge.cat2{ background:var(--cat2-bg); color:var(--cat2-fg); border-color:#fde68a }
+      .badge.cat3{ background:var(--cat3-bg); color:var(--cat3-fg); border-color:#d8b4fe }
+      .badge.cat4{ background:var(--cat4-bg); color:var(--cat4-fg); border-color:#bbf7d0 }
+
+      .card-body{
+        padding:12px;
+      }
+      .stats{
+        display:grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap:10px;
+      }
+      .stat{
+        background:#f8fafc;
+        border:1px solid var(--border);
+        border-radius:12px;
+        padding:10px;
+        font-size:.93rem;
+      }
+      .stat b{display:block; font-size:.78rem; color:var(--muted); margin-bottom:4px}
+
+      .extra{
+        margin-top:12px;
+        display:none;
+      }
+      .card.expanded .extra{ display:block }
+
+      .empty{
+        background:#fff;
+        border:1px dashed var(--border);
+        color:var(--muted);
+        border-radius:12px;
+        padding:18px;
+        text-align:center;
+      }
+
+      @media (max-width: 1024px){
+        .app{ grid-template-columns: 1fr }
+        aside.sidebar{ display:none }
+        .cards{ grid-template-columns: repeat(2, minmax(240px, 1fr)) }
+      }
+      @media (max-width: 640px){
+        .cards{ grid-template-columns: 1fr }
+        .filters-grid{ grid-template-columns: repeat(2, minmax(140px,1fr)) }
+        .stats{ grid-template-columns: 1fr 1fr }
+        .card-header{ grid-template-columns: 100px 1fr }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">Bestias</div>
+        <div class="cat-hint">Filtra rápidamente por categoría</div>
+        <div class="cat-list" id="catList">
+          <button class="cat-btn active" data-cat="Todas">Todas</button>
+          <button class="cat-btn" data-cat="Categoría 1">Categoría 1</button>
+          <button class="cat-btn" data-cat="Categoría 2">Categoría 2</button>
+          <button class="cat-btn" data-cat="Categoría 3">Categoría 3</button>
+          <button class="cat-btn" data-cat="Categoría 4">Categoría 4</button>
+        </div>
+      </aside>
+      <main class="content">
+        <div class="toolbar">
+          <div class="search">
+            <span>🔎</span>
+            <input id="searchInput" type="search" placeholder="Buscar por nombre..." aria-label="Buscar bestias por nombre" />
+          </div>
+          <select id="sortAttr" class="sel" aria-label="Ordenar por atributo">
+            <option value="">Ordenar por…</option>
+            <option value="nombre">Nombre</option>
+            <option value="dano">Daño</option>
+            <option value="ca">C.A.</option>
+            <option value="vitalidad">Vitalidad</option>
+            <option value="px">PX</option>
+            <option value="movimiento">Movimiento</option>
+            <option value="dano_alcance">Rango alcance</option>
+          </select>
+          <select id="sortDir" class="sel" aria-label="Dirección de orden">
+            <option value="asc">Ascendente</option>
+            <option value="desc">Descendente</option>
+          </select>
+          <button id="clearBtn" class="btn">Limpiar filtros</button>
+        </div>
+
+        <div class="filters">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <strong>¿Necesitas más filtros?</strong>
+            <a class="btn primary" href="filtros.html" aria-label="Ir a búsqueda avanzada">Búsqueda avanzada</a>
+          </div>
+        </div>
+
+        <div class="results-bar">
+          <div id="resultCount">0 resultados</div>
+          <div>Haz clic en una tarjeta para ver todos los detalles</div>
+        </div>
+
+        <div class="cards" id="cards"></div>
+      </main>
+    </div>
+
+    <script src="data.js"></script>
+    <script>
+      const bestias = Array.isArray(window.bestias) ? window.bestias : [];
+
+      // ===============================
+      // Estado y referencias de UI
+      // ===============================
+      const cardsEl = document.getElementById('cards');
+      const resultCountEl = document.getElementById('resultCount');
+      const searchInput = document.getElementById('searchInput');
+      const sortAttr = document.getElementById('sortAttr');
+      const sortDir = document.getElementById('sortDir');
+      const clearBtn = document.getElementById('clearBtn');
+      const catList = document.getElementById('catList');
+      const filters = null; // filtros avanzados se usan en filtros.html
+      let currentCategory = 'Todas';
+
+      const attrMap = {
+        nombre: 'nombre',
+        dano: 'dano',
+        ca: 'ca',
+        vitalidad: 'vitalidad',
+        px: 'px',
+        movimiento: 'movimiento',
+        dano_alcance: 'dano_alcance'
+      };
+
+      // ===============================
+      // Lógica de filtrado y orden
+      // ===============================
+      function norm(s){
+        return String(s || '')
+          .trim()
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g,'');
+      }
+      function num(val){
+        const n = Number(val);
+        return Number.isFinite(n) ? n : null;
+      }
+      function bullets(text){
+        const s = String(text||'').trim();
+        if(!s) return '';
+        const parts = s.split(/[.\n;•]+/).map(t=>t.trim()).filter(Boolean);
+        return '<ul>' + parts.map(t=>'<li>'+t+'</li>').join('') + '</ul>';
+      }
+
+      function pasaRango(value, minEl, maxEl){
+        const v = Number(value);
+        const mn = num(minEl.value);
+        const mx = num(maxEl.value);
+        if (mn !== null && v < mn) return false;
+        if (mx !== null && v > mx) return false;
+        return true;
+      }
+
+      function filtrar(lista){
+        const q = (searchInput.value || '').trim().toLowerCase();
+        return lista.filter(b => {
+          if (norm(currentCategory) !== 'todas' && (norm(b.categoria) !== norm(currentCategory))) return false;
+          if (q && !(b.nombre || '').toLowerCase().includes(q)) return false;
+          // filtros avanzados removidos de index; disponibles en filtros.html
+          return true;
+        });
+      }
+
+      function ordenar(lista){
+        const key = attrMap[sortAttr.value];
+        const dir = sortDir.value === 'desc' ? -1 : 1;
+        if (!key) return lista;
+        return [...lista].sort((a,b) => {
+          const va = a[key]; const vb = b[key];
+          if (typeof va === 'number' && typeof vb === 'number'){
+            return (va - vb) * dir;
+          }
+          const sa = String(va ?? '').toLowerCase();
+          const sb = String(vb ?? '').toLowerCase();
+          if (sa < sb) return -1 * dir;
+          if (sa > sb) return  1 * dir;
+          return 0;
+        });
+      }
+
+      // ===============================
+      // Render de tarjetas
+      // ===============================
+      function catClass(cat){
+        switch(norm(cat)){
+          case 'categoria 1': return 'cat1';
+          case 'categoria 2': return 'cat2';
+          case 'categoria 3': return 'cat3';
+          case 'categoria 4': return 'cat4';
+          default: return 'cat1';
+        }
+      }
+
+      function crearCard(b){
+        const el = document.createElement('article');
+        el.className = 'card';
+        el.innerHTML = `
+          <div class="card-header">
+            <img class="card-img" src="${b.imagen ?? ''}" alt="${b.nombre ?? ''}" />
+            <div class="card-title">
+              <div class="name">${b.nombre ?? ''}</div>
+              <span class="badge ${catClass(b.categoria)}">${b.categoria ?? ''}</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="stats">
+              <div class="stat"><b>Daño</b>${b.dano_texto ?? (b.dano ?? '-')}</div>
+              <div class="stat"><b>C.A.</b>${b.ca ?? '-'}</div>
+              <div class="stat"><b>Vitalidad</b>${b.vitalidad ?? '-'}</div>
+              <div class="stat"><b>PX</b>${b.px ?? '-'}</div>
+              <div class="stat"><b>Movimiento</b>${b.movimiento ?? '-'}</div>
+              <div class="stat"><b>Rango alcance</b>${b.dano_alcance ?? '-'}</div>
+            </div>
+            <div class="extra">
+              <div class="stat"><b>Fortalezas</b>${bullets(b.fortalezas)}</div>
+              <div class="stat"><b>Debilidades</b>${bullets(b.debilidades)}</div>
+              <div class="stat"><b>Localización</b>${b.localizacion ?? ''}</div>
+              <div class="stat"><b>Alineamiento</b>${b.alineamiento ?? ''}</div>
+              <div class="stat"><b>Descripción</b>${b.descripcion ?? ''}</div>
+            </div>
+          </div>
+        `;
+        el.addEventListener('click', () => {
+          const slug = norm(b.nombre).replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+          location.href = `detalle.html?id=${encodeURIComponent(slug)}`;
+        });
+        return el;
+      }
+
+      function render(){
+        cardsEl.innerHTML = '';
+        const filtradas = filtrar(bestias);
+        const ordenadas = ordenar(filtradas);
+        resultCountEl.textContent = `${ordenadas.length} resultado${ordenadas.length!==1?'s':''}`;
+        if (ordenadas.length === 0){
+          const empty = document.createElement('div');
+          empty.className = 'empty';
+          empty.textContent = 'No hay bestias para mostrar. Agrega tus datos en el JSON.';
+          cardsEl.appendChild(empty);
+          return;
+        }
+        for(const b of ordenadas){
+          cardsEl.appendChild(crearCard(b));
+        }
+      }
+
+      // ===============================
+      // Eventos UI
+      // ===============================
+      searchInput.addEventListener('input', render);
+      sortAttr.addEventListener('change', render);
+      sortDir.addEventListener('change', render);
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        sortAttr.value = '';
+        sortDir.value = 'asc';
+        currentCategory = 'Todas';
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat==='Todas'));
+        render();
+      });
+
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentCategory = btn.dataset.cat;
+          document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b===btn));
+          render();
+        });
+      });
+
+      // filtros avanzados no disponibles en index
+
+      // Primera renderización (lista vacía)
+      render();
+    </script>
+  </body>
+</html>
