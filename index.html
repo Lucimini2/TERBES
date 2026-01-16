@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Bestias | Organizador y Buscador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
       :root{
         --bg: #f4f6f8;
@@ -196,12 +197,12 @@
       .badge.cat4{ background:var(--cat4-bg); color:var(--cat4-fg); border-color:#bbf7d0 }
 
       .card-body{
-        padding:12px;
+        padding:16px;
       }
       .stats{
         display:grid;
         grid-template-columns: repeat(3, 1fr);
-        gap:10px;
+        gap:12px;
       }
       .stat{
         background:#f8fafc;
@@ -339,6 +340,16 @@
         const parts = s.split(/[.\n;•]+/).map(t=>t.trim()).filter(Boolean);
         return '<ul>' + parts.map(t=>'<li>'+t+'</li>').join('') + '</ul>';
       }
+      function fmtPX(v){
+        const n = Number(v);
+        if (Number.isFinite(n)) return new Intl.NumberFormat('es-ES').format(n);
+        return String(v ?? '-');
+      }
+      function fmtCasillas(v){
+        const n = Number(v);
+        if (!Number.isFinite(n)) return String(v ?? '-');
+        return n + ' ' + (n===1?'Casilla':'Casillas');
+      }
 
       function pasaRango(value, minEl, maxEl){
         const v = Number(value);
@@ -381,40 +392,58 @@
       // ===============================
       function catClass(cat){
         switch(norm(cat)){
-          case 'categoria 1': return 'cat1';
-          case 'categoria 2': return 'cat2';
-          case 'categoria 3': return 'cat3';
-          case 'categoria 4': return 'cat4';
-          default: return 'cat1';
+          case 'categoria 1': return 'bg-sky-100 text-sky-800 ring-sky-300';
+          case 'categoria 2': return 'bg-amber-100 text-amber-800 ring-amber-300';
+          case 'categoria 3': return 'bg-violet-100 text-violet-800 ring-violet-300';
+          case 'categoria 4': return 'bg-green-100 text-green-800 ring-green-300';
+          default: return 'bg-sky-100 text-sky-800 ring-sky-300';
         }
       }
 
       function crearCard(b){
         const el = document.createElement('article');
-        el.className = 'card';
+        el.className = 'card rounded-2xl shadow-md hover:shadow-lg border border-gray-200 bg-white overflow-hidden transition cursor-pointer';
         el.innerHTML = `
-          <div class="card-header">
-            <img class="card-img" src="${b.imagen ?? ''}" alt="${b.nombre ?? ''}" />
-            <div class="card-title">
-              <div class="name">${b.nombre ?? ''}</div>
-              <span class="badge ${catClass(b.categoria)}">${b.categoria ?? ''}</span>
+          <div class="grid grid-cols-[120px_1fr] gap-3 p-3 border-b border-gray-200 items-center">
+            <img class="w-full h-24 object-cover rounded-xl bg-slate-100" src="${b.imagen ?? ''}" alt="${b.nombre ?? ''}" />
+            <div class="flex flex-col gap-2">
+              <div class="font-extrabold text-lg text-gray-900">${b.nombre ?? ''}</div>
+              <span class="inline-flex items-center w-max px-3 py-1 rounded-full ring-1 ring-inset ${catClass(b.categoria)}">${b.categoria ?? ''}</span>
             </div>
           </div>
-          <div class="card-body">
-            <div class="stats">
-              <div class="stat"><b>Daño</b>${b.dano_texto ?? (b.dano ?? '-')}</div>
-              <div class="stat"><b>C.A.</b>${b.ca ?? '-'}</div>
-              <div class="stat"><b>Vitalidad</b>${b.vitalidad ?? '-'}</div>
-              <div class="stat"><b>PX</b>${b.px ?? '-'}</div>
-              <div class="stat"><b>Movimiento</b>${b.movimiento ?? '-'}</div>
-              <div class="stat"><b>Rango alcance</b>${b.dano_alcance ?? '-'}</div>
+          <div class="p-4">
+            <div class="grid grid-cols-3 gap-3">
+              <div class="bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
+                <b class="block text-xs text-gray-500 font-semibold mb-1">Daño</b>
+                <div class="text-gray-900 font-semibold">${b.dano_texto ?? (b.dano ?? '-')}</div>
+              </div>
+              <div class="bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
+                <b class="block text-xs text-gray-500 font-semibold mb-1">C.A.</b>
+                <div class="text-gray-900 font-semibold">${b.ca ?? '-'}</div>
+              </div>
+              <div class="bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
+                <b class="block text-xs text-gray-500 font-semibold mb-1">Vitalidad</b>
+                <div class="text-gray-900 font-semibold">${b.vitalidad ?? '-'}</div>
+              </div>
+              <div class="bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
+                <b class="block text-xs text-gray-500 font-semibold mb-1">PX</b>
+                <div class="text-gray-900 font-semibold">${fmtPX(b.px)}</div>
+              </div>
+              <div class="bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
+                <b class="block text-xs text-gray-500 font-semibold mb-1">Movimiento</b>
+                <div class="text-gray-900 font-semibold">${fmtCasillas(b.movimiento)}</div>
+              </div>
+              <div class="bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
+                <b class="block text-xs text-gray-500 font-semibold mb-1">Rango alcance</b>
+                <div class="text-gray-900 font-semibold">${fmtCasillas(b.dano_alcance)}</div>
+              </div>
             </div>
-            <div class="extra">
-              <div class="stat"><b>Fortalezas</b>${bullets(b.fortalezas)}</div>
-              <div class="stat"><b>Debilidades</b>${bullets(b.debilidades)}</div>
-              <div class="stat"><b>Localización</b>${b.localizacion ?? ''}</div>
-              <div class="stat"><b>Alineamiento</b>${b.alineamiento ?? ''}</div>
-              <div class="stat"><b>Descripción</b>${b.descripcion ?? ''}</div>
+            <div class="extra hidden">
+              <div class="mt-3 bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm"><b class="block text-xs text-gray-500 font-semibold mb-1">Fortalezas</b>${bullets(b.fortalezas)}</div>
+              <div class="mt-3 bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm"><b class="block text-xs text-gray-500 font-semibold mb-1">Debilidades</b>${bullets(b.debilidades)}</div>
+              <div class="mt-3 bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm"><b class="block text-xs text-gray-500 font-semibold mb-1">Localización</b>${b.localizacion ?? ''}</div>
+              <div class="mt-3 bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm"><b class="block text-xs text-gray-500 font-semibold mb-1">Alineamiento</b>${b.alineamiento ?? ''}</div>
+              <div class="mt-3 bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm"><b class="block text-xs text-gray-500 font-semibold mb-1">Descripción</b>${b.descripcion ?? ''}</div>
             </div>
           </div>
         `;
