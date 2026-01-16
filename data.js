@@ -564,6 +564,57 @@ window.bestias = [
     alineamiento: "Neutral/Legal",
     descripcion: "Criatura legendaria que combina caballo y águila. Parte delantera de águila gigante con pico afilado, alas poderosas y garras robustas; parte posterior de caballo con cuerpo musculoso, patas robustas y cola larga. Alas grandes le permiten volar con gracia y rapidez.",
     imagen: "imgs/hipogrifo.png"
+  },
+  {
+    nombre: "Cría de Dragón",
+    categoria: "Categoría 1",
+    fortalezas: "-Las crías de dragón poseen un potencial ilimitado de crecimiento y desarrollo, lo que les permite alcanzar la magnificiencia y poder de los dragones adultos con el tiempo.\n-Aunque sus habilidades mágicas pueden ser menos desarrolladas que las de los dragones adultos, aún pueden manifestar una variedad de habilidades mágicas y elementales, como el aliento de fuego, la manipulación del clima y varios más.\n-A pesar de su juventud, son resistentes y difíciles de derrotar. Sus cuerpos robustos y escamas protectoras les otorgan gran resistencia a ataques físicos y arcanos.",
+    debilidades: "-Durante su desarrollo, pueden ser más vulnerables a amenazas externas debido a su menor tamaño y experiencia.\n-A medida que aprenden a dominar sus habilidades, pueden carecer de la experiencia y sabiduría necesarias para enfrentar desafíos complejos o estratégicos.\n-Son especialmente vulnerables a la magia elemental de rayo, que puede penetrar sus escamas protectoras y causar daño significativo.",
+    dano_texto: "1D6 (Aliento de Dragón)",
+    dano: 1, 
+    ca: 16, 
+    vitalidad: 25, 
+    px: 1000,
+    movimiento: 4,
+    dano_alcance: 2,
+    localizacion: "Pueden habitar el plano elemental o el plano terrenal, en el norte más profundo de Stungerb.",
+    alineamiento: "Neutral/Caótico (puede variar según la influencia de sus padres y el entorno en el que son criados)",
+    descripcion: "Las crías de dragón son versiones jóvenes de los legendarios dragones. Aunque varían según la especie, comparten rasgos comunes: cuerpos robustos, escamas relucientes y una apariencia más vivaz. A pesar de su juventud son seres muy peligrosos, con capacidad para habilidades mágicas y gran resistencia gracias a sus escamas protectoras.",
+    imagen: "imgs/criadedragon.png"
+  },
+  {
+    nombre: "Cusith",
+    categoria: "Categoría 1",
+    fortalezas: "-El Cusith puede crear un puente arco iris entre el plano terrenal y el plano de ensueño, permitiéndole viajar entre ambos mundos y transportar a otros.\n-Aunque es imponente en apariencia, el Cusith es una criatura pacífica y gentil que busca la armonía y prefiere evitar conflictos.\n-Sus alas astrales le proporcionan una capacidad de vuelo extraordinaria, permitiéndole desplazarse con gracia y velocidad a través de los cielos.",
+    debilidades: "-El Cusith puede ser vulnerable a los poderes de corrupción oscura, que pueden debilitarlo o incluso controlar su voluntad.\n-Su naturaleza gentil y confiada puede llevarlo a confiar en aquellos que no lo merecen, exponiéndolo a situaciones de peligro o traición.\n-Los cuernos del Cusith son un punto débil; si se dañan, puede quedar indefenso.",
+    dano_texto: "2D4 (Envestida)",
+    dano: 2,
+    ca: 8,
+    vitalidad: 18,
+    px: 900,
+    movimiento: 8,
+    dano_alcance: 1,
+    localizacion: "El Cusith se encuentra generalmente en los días de lluvia soleada, cabalgando en el arco iris entre el plano terrenal y el plano de ensueño.",
+    alineamiento: "Legal",
+    descripcion: "El Cusith es una criatura mística conocida como la bestia que cabalga en el arco iris. Tiene cuerpo peludo de alce, cuernos majestuosos de gran ciervo, rostro sabio y gentil, y alas astrales de colores vivos semejantes al arco iris. Irradia calma y serenidad, transmitiendo una gentileza ancestral.",
+    imagen: "imgs/cusith.png"
+  },
+  {
+    "nombre": "Gramenbys",
+    "categoria": "Categoría 1",
+    "fortalezas": "Resistencia sobrenatural debido a su cuerpo de piedra mágica y viva, que les proporciona una protección excepcional contra ataques físicos y magia elemental.\nInfatigables, lo que les permite mantenerse en pie y combatir durante largos períodos sin mostrar signos de fatiga.\nDominio de la magia de la naturaleza, que les permite controlar las plantas, comunicarse con la vegetación y utilizar diversas habilidades mágicas relacionadas con la flora.",
+    "debilidades": "Vulnerabilidad a la magia oscura o corrupta, que puede debilitar su conexión con la energía natural y sagrada, afectando su resistencia y habilidades.\nAunque su cuerpo de piedra es resistente, pueden ser vulnerables a ciertos tipos de ataques mágicos específicos que afecten directamente a los materiales minerales.\nSon más susceptibles a los ataques perforantes, ya que su resistencia se basa en gran medida en su dureza y protección superficial.",
+    "dano_texto": "2D4 (arañazo)",
+    "dano": 0,
+    "ca": 7,
+    "vitalidad": 20,
+    "px": 10700,
+    "movimiento": 8,
+    "dano_alcance": 1,
+    "localizacion": "En el plano terrenal, los Gramenbys suelen encontrarse en áreas boscosas, montañosas o sagradas donde la energía de la naturaleza es fuerte y abundante. Pueden aparecer como monturas para seres humanoides que protegen y preservan la naturaleza, actuando como guardianes de estos lugares sagrados.",
+    "alineamiento": "Legal",
+    "descripcion": "Los Gramenbys son criaturas de la naturaleza con cuerpos de piedra mágica y viva, cuya apariencia recuerda a los ajolotes, pero en una escala mucho más grande y robusta. Su piel de piedra está impregnada de energía mágica de la naturaleza. Poseen grandes garras metálicas afiladas y su cuerpo emana una magia que evoca símbolos mágicos tanto de la esencia de la naturaleza como la sagrada.",
+    "imagen": "imgs/gramenbys.png"
   }
 ];
 
