@@ -18,6 +18,7 @@
 //
 // Nota: No se incluyen ejemplos adicionales para respetar tu petición.
 // Categoria 1: de linea 24 hasta linea 755
+// Categoria 2: de linea 755 hasta linea 1231
 
 window.bestias = [
   {
@@ -1228,6 +1229,108 @@ window.bestias = [
     "alineamiento": "Neutral/Legal",
     "descripcion": "El Amarok es un imponente lobo solitario, cuya figura alcanza la altura de un elefante. Su pelaje es grueso y varía en tonalidades blancas, grises y marrones, perfectamente adaptado a los entornos de las tundras y las montañas. Sus ojos brillan con intensidad en la oscuridad, mientras que sus colmillos afilados y garras poderosas resaltan su naturaleza depredadora. Inspirando respeto y temor por igual, el Amarok se destaca como una presencia formidable que trae paz en su hábitat natural.",
     "imagen": "imgs/amarok.png"
+  },
+  {
+    "nombre": "Raya Kahu",
+    "categoria": "Categoría 3",
+    "fortalezas": "-La Raya Kahu usa continuamente mientras vuela el poder de desatar tormentas de rayos arcanos que arrasan todo a su paso. Estas tormentas son devastadoras y pueden destruir barcos, islas e incluso criaturas poderosas que se interpongan en su camino.\n-Su cuerpo está imbuido con una resistencia extraordinaria a la magia sagrada o espiritual, lo que le proporciona una protección adicional contra ataques de este tipo.\n-Su cuerpo repele prácticamente cualquier proyectil mágico, lo que dificulta que los ataques mágicos le causen daño significativo.",
+    "debilidades": "-La Raya Kahu está intrínsecamente ligada al plano arcano, lo que significa que su poder se ve afectado por los cambios en este plano. Si se aleja demasiado de su hábitat natural, puede perder parte de su fuerza y vitalidad.\n-Aunque su cuerpo repele los proyectiles mágicos, es vulnerable a los ataques físicos. Las armas cortantes pueden herirla si logran alcanzarla.\n-Suele ser pacífica, a pesar de estar en estado de lanzar tormentas; no obstante, esta es su única forma de atacar, y a veces daña sin querer hacerlo, por lo cual no tiene muchas estrategias de combate.",
+    "dano_texto": "4D10 (Tormenta arcana)",
+    "dano": 0,
+    "ca": 13,
+    "vitalidad": 300,
+    "px": 413300,
+    "movimiento": 4,
+    "dano_alcance": 5,
+    "localizacion": "La Raya Kahu habita especialmente en el plano arcano, donde vuela majestuosamente sobre los mares, desencadenando tormentas de rayos arcanos mientras viaja sin cesar por todos los mares de este plano existencial.",
+    "alineamiento": "Neutral/Legal",
+    "descripcion": "La Raya Kahu es una criatura colosal que sobrevuela los mares del plano arcano. Con aproximadamente unos 200 metros de diámetro, su presencia es impresionante y muy temida. Su forma se asemeja a la de una mantarraya gigante, con alas de aleta que se extienden majestuosa­mente a lo largo de su cuerpo. Todo su cuerpo está adornado con símbolos arcanos antiguos y misteriosos, que resplandecen con una luz brillante y pulsante, emanando de sí mismo un gran poder.",
+    "imagen": "imgs/rayakahu.png"
+  },
+  {
+    "nombre": "Ojo Dominador",
+    "categoria": "Categoría 3",
+    "fortalezas": "-Los ojos invocados del Ojo Dominador pueden ver y leer todo, historia, anatomía, poderes, debilidades, fortaleza mental y potencial, lo que le proporciona un conocimiento casi ilimitado.\n-Con sus tentáculos y su mirada hipnótica, el Ojo Dominador es capaz de ejercer un control telequinético sobre objetos inertes, manipulándolos a su voluntad y puede abrir portales a otros planos o dimensiones, permitiendo la entrada y salida de entidades o energías.\n-Puede lanzar potentes rayos de energía desde su ojo, capaces de desintegrar objetos e incluso criaturas que se hallen en su trayectoria con mucha facilidad.",
+    "debilidades": "-A pesar de su poder, el Ojo Dominador es vulnerable a los ataques físicos directos contra su globo ocular central y sus tentáculos, los cuales son puntos críticos de debilidad.\n-Son fotosensibles; la luz provoca una ceguera temporal que puede neutralizar su capacidad de observación y lectura, limitando su alcance y eficacia.\n-Después de utilizar su rayo desintegrador, el Ojo Dominador requiere un período de tiempo para recuperarse del esfuerzo y del daño infligido por este poderoso ataque.",
+    "dano_texto": "3D10 (Rayo Desintegrador)",
+    "dano": 0,
+    "ca": 9,
+    "vitalidad": 138,
+    "px": 100000,
+    "movimiento": 4,
+    "dano_alcance": 8,
+    "localizacion": "El Ojo Dominador se encuentra generalmente en lo más profundo y oscuro del plano abisal, donde ejerce su dominio sobre la realidad distorsionada y la desesperación que lo rodea. No obstante, muy a menudo se pueden ver acompañados de abisarios.",
+    "alineamiento": "Neutral/Caótico",
+    "descripcion": "El Ojo Dominador es una entidad aterradora que se manifiesta como un globo ocular gigante rodeado de tentáculos serpenteantes y una boca terrible. Su núcleo, el globo ocular, está adornado con una mirada penetrante y despiadada, capaz de observar y registrar todo lo que ocurre a su alrededor. Los tentáculos que lo rodean se retuercen y serpentean, listos para agarrar y manipular a sus presas. Su boca, llena de filosos dientes, emana un aura de peligro y voracidad.",
+    "imagen": "imgs/ojodominador.png"
+  },
+  {
+    "nombre": "Nathos",
+    "categoria": "Categoría 3",
+    "fortalezas": "-Los Nathos pueden contrarrestar a criaturas que dependen de la fuerza bruta o la resistencia física mediante su capacidad para manipular mentes y crear ilusiones aterradoras.\n-Pueden dominar fácilmente las mentes y controlar las acciones de criaturas que carecen de resistencia mental o habilidades psíquicas.\n-Son resistentes a las magias sagradas, elementales y arcanas, lo que les proporciona una defensa robusta contra diversos tipos de ataques mágicos.",
+    "debilidades": "-Criaturas con resistencia mental excepcional o inmunidad a la manipulación psíquica pueden resistir los intentos de los Nathos de influir en sus mentes.\n-Aquellos que son ágiles de cuerpo y mente pueden esquivar sus ataques físicos y mentales, reduciendo la efectividad de los Nathos en combate.\n-El daño infernal puede afectar gravemente a los Nathos, lo que representa una vulnerabilidad significativa en su defensa.",
+    "dano_texto": "2D8 + 2D10 (Tentáculos + Ataque psíquico)",
+    "dano": 0,
+    "ca": 3,
+    "vitalidad": 235,
+    "px": 239300,
+    "movimiento": 1,
+    "dano_alcance": 9,
+    "localizacion": "Proveniente del plano abisal, es posible que puedas hallarlos en las profundidades del océano, lagos y cuevas subterráneas.",
+    "alineamiento": "Caótico",
+    "descripcion": "El Nathos es una criatura temible, conocida por su habilidad para manipular las mentes de aquellos que se cruzan en su camino e infundirles imágenes terroríficas. Tiene una forma similar a la de una anguila gigante, con una piel viscosa y cubierta de mucosidad que brilla con un tono oscuro, y múltiples ojos inquietantes. A pesar de su aspecto repulsivo, los Nathos son seres extremadamente peligrosos y astutos, capaces de controlar a voluntad a las criaturas que habitan en las profundidades o que están dentro de su rango de alcance.",
+    "imagen": "imgs/nathos.png"
+  },
+  {
+    "nombre": "Locus de Mare",
+    "categoria": "Categoría 3",
+    "fortalezas": "-Posee la habilidad para manipular el terreno y el clima, lo que le otorga un control significativo sobre su entorno acuático.\n-Capacidad para controlar la fauna acuática circundante, utilizándola estratégicamente en la caza y para su protección.\n-Es experto en cazar depredadores mucho más grandes que él mismo, utilizando tácticas astutas y su entorno a su favor.",
+    "debilidades": "-Incapacidad para respirar fuera del agua, lo que lo hace vulnerable si es expulsado de su entorno acuático.\n-Su naturaleza no agresiva puede hacerlo más susceptible a ser engañado o manipulado por criaturas más astutas que busquen aprovechar su buena voluntad.\n-El afán por cazar depredadores más grandes lo expone a riesgos mortales, habiendo perdido la vida varios individuos de esta especie en enfrentamientos desafiantes.",
+    "dano_texto": "4D8 (Mordisco elemental)",
+    "dano": 0,
+    "ca": 13,
+    "vitalidad": 138,
+    "px": 63800,
+    "movimiento": 5,
+    "dano_alcance": 1,
+    "localizacion": "Residen en áreas marinas y costeras del plano elemental, donde ejercen su influencia sobre el entorno acuático y sus habitantes.",
+    "alineamiento": "Neutral/Legal",
+    "descripcion": "El Locus de Mare es una entidad similar a un gran lobo marino, dotada de una poderosa presencia en el mundo acuático. Estas criaturas son altamente poderosas, capaces de manipular el terreno y el clima a su alrededor. Además, tienen el control sobre la fauna acuática cercana, utilizando su influencia para cazar depredadores mucho más grandes que ellos mismos. Aunque son depredadores formidables, el Locus de Mare tiene una naturaleza no agresiva hacia los seres vivos indefensos, quienes se sienten atraídos y protegidos por su presencia.",
+    "imagen": "imgs/locusdemare.png"
+  },
+  {
+    "nombre": "Igfis",
+    "categoria": "Categoría 3",
+    "fortalezas": "-Dotado con una visión excepcional, el Igfis es capaz de acechar incluso en la más densa oscuridad, convirtiéndose en un depredador letal en la noche.\n-Las escamas que recubren su cuerpo actúan como una armadura impenetrable, brindándole una protección formidable contra cualquier ataque físico o corte profundo.\n-Cada una de las tres cabezas del Igfis puede lanzar potentes ultrasonidos que desorientan y aturden a sus presas, dejándolas vulnerables a sus mortales embestidas.",
+    "debilidades": "-A pesar de su fortaleza, el Igfis es vulnerable al fuego, que puede infligirle daño severo y obligarlo a retroceder en busca de seguridad.\n-Dada su imponente envergadura, el Igfis es propenso a caer en trampas y emboscadas, lo que puede ser aprovechado por enemigos astutos.\n-Si los oídos de su presa están protegidos, el Igfis se ve limitado a atacar con sus garras y colas, reduciendo su capacidad para desorientar con sus ultrasonidos.",
+    "dano_texto": "3D12 (Ataque sónico)",
+    "dano": 0,
+    "ca": 6,
+    "vitalidad": 260,
+    "px": 310300,
+    "movimiento": 4,
+    "dano_alcance": 7,
+    "localizacion": "El Igfis es comúnmente avistado en pantanos y áreas húmedas del plano terrenal, donde puede moverse con facilidad entre la densa vegetación y acechar a sus presas en la oscuridad de la noche.",
+    "alineamiento": "Caótico",
+    "descripcion": "El Igfis es una criatura gigantesca con un cuerpo revestido de escamas tan resistentes como el acero. Sus alas, parecidas a las de un ave, le permiten un vuelo que desafía las leyes naturales, mientras su cola reptiliana se desliza sinuosa detrás de él. Sin embargo, lo más impresionante de esta bestia son sus tres cabezas de cánido salvaje, que mantiene su pelaje y con una expresión única cada una de ellas. La cabeza izquierda emana positividad, la central una serenidad inquietante y la derecha una profunda negatividad.",
+    "imagen": "imgs/igfis.png"
+  },
+  {
+    "nombre": "Dragón Adulto",
+    "categoria": "Categoría 3",
+    "fortalezas": "-El dragón adulto posee una fuerza física colosal, capaz de derribar estructuras y oponentes con facilidad.\n-Su aliento es una poderosa arma ofensiva que puede incinerar a sus enemigos en cuestión de segundos. Además de que sus alas pueden provocar vendavales, creando un entorno caótico y difícil para los enemigos.\n-Su armadura de escamas proporciona una protección formidable contra ataques físicos y proyectiles.",
+    "debilidades": "-Aunque su armadura de escamas ofrece una gran protección, el dragón adulto es vulnerable a la magia elemental de tipo rayo, que puede atravesar su defensa natural.\n-Su tamaño colosal puede ser una desventaja en espacios reducidos, donde su movilidad se ve severamente limitada.\n-Existen flechas especialmente diseñadas para ser muy efectivas contra dragones, penetrando sus escamas y causándoles gran daño.",
+    "dano_texto": "2D10 (Mordisco) + 2D6 (Aliento Venenoso)",
+    "dano": 0,
+    "ca": 4,
+    "vitalidad": 255,
+    "px": 700000,
+    "movimiento": 6,
+    "dano_alcance": 4,
+    "localizacion": "Aunque originarios del plano elemental, varios tipos de dragones se han asentado en las Montañas Inversas del plano terrenal.",
+    "alineamiento": "Neutral/Caótico",
+    "descripcion": "El dragón adulto es una criatura imponente que personifica el poder y la grandeza promedia de su especie. Con su gran tamaño y su cuerpo cubierto de escamas resistentes, inspira temor y reverencia en todos los que tienen la fortuna (o desgracia) de encontrarse con él. Sus membranosas alas extendidas a su espalda le permiten surcar los cielos con rapidez. Su aliento es un torrente de fuego ardiente capaz de arrasar incluso las estructuras más resistentes. Sus colmillos y garras son armas letales capaces de destrozar a cualquier oponente que se atreva a desafiar su dominio.",
+    "imagen": "imgs/dragonadulto.png"
   }
 ];
 
