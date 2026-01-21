@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Categorías</title>
+    <style>
+      :root{ --bg:#f4f6f8; --surface:#fff; --text:#111827; --muted:#6b7280; --border:#e5e7eb; --shadow: 0 8px 20px rgba(0,0,0,0.06) }
+      *{box-sizing:border-box}
+      body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+      .wrap{max-width:1100px;margin:0 auto;padding:20px}
+      .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+      .back{display:inline-block;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;text-decoration:none;color:#111827}
+      .title{font-weight:800}
+      .subtitle{color:var(--muted); margin:0 0 12px 0}
+      .toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+      .search{flex:1 1 260px;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+      .search input{flex:1;border:none;outline:none;font-size:1rem;background:transparent}
+      .cards{display:grid;grid-template-columns: repeat(3, minmax(280px, 1fr));gap:16px}
+      .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;transition:box-shadow .2s, transform .04s;cursor:pointer}
+      .card:hover{box-shadow:0 12px 28px rgba(0,0,0,0.10)}
+      .card-header{display:grid;grid-template-columns: 120px 1fr;gap:12px;padding:12px;border-bottom:1px solid var(--border);align-items:center}
+      .card-img{width:100%;height:100%;max-height:96px;object-fit:cover;border-radius:10px;background:#f1f5f9}
+      .card-title{display:flex;flex-direction:column;gap:6px}
+      .name{font-weight:800;font-size:1.05rem}
+      .badge{display:inline-flex;align-items:center;gap:8px;font-size:.85rem;font-weight:700;width:max-content;padding:6px 10px;border-radius:999px;border:1px solid transparent;background:#eef2ff;color:#3730a3}
+      .card-body{padding:16px}
+      .stats{display:grid;grid-template-columns: repeat(3, minmax(0,1fr));gap:16px}
+      .stat{background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:10px;font-size:.93rem}
+      .stat b{display:block;font-size:.78rem;color:var(--muted);margin-bottom:4px}
+      .value{display:block;overflow-wrap:anywhere;word-break:break-word}
+      @media (max-width:1024px){ .cards{grid-template-columns: repeat(2, minmax(240px, 1fr))} }
+      @media (max-width:640px){ .cards{grid-template-columns: 1fr} }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="top">
+        <a class="back" href="index.html">← Volver</a>
+        <strong class="title" id="catTitle">Categoría</strong>
+      </div>
+      <div class="subtitle" id="catCount"></div>
+      <div class="toolbar">
+        <div class="search"><span>🔎</span><input id="searchInput" type="search" placeholder="Buscar por nombre" /></div>
+      </div>
+      <div class="cards" id="cards"></div>
+    </div>
+    <script src="data.js"></script>
+    <script>
+      const cardsEl = document.getElementById('cards');
+      const searchInput = document.getElementById('searchInput');
+      const catTitle = document.getElementById('catTitle');
+      const params = new URLSearchParams(location.search);
+      const cat = params.get('cat') || 'Todas';
+      const list = Array.isArray(window.bestias) ? window.bestias : [];
+      function norm(s){return String(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
+      function slugify(s){return norm(s).replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')}
+      function parseDamage(expr){
+        const facesAllowed = ['3','4','6','8','10','12','20','100'];
+        if (typeof expr !== 'string') return null;
+        const cleaned = expr.toLowerCase().replace(/\([^)]*\)/g,'').trim();
+        if (!cleaned) return null;
+        const valid = /^\s*(\d+\s*d\s*(3|4|6|8|10|12|20|100))(\s*\+\s*\d+\s*d\s*(3|4|6|8|10|12|20|100))*\s*$/.test(cleaned);
+        if (!valid) return null;
+        let min = 0, max = 0, avg = 0;
+        const re = /(\d+)\s*d\s*(3|4|6|8|10|12|20|100)/g;
+        let m;
+        while ((m = re.exec(cleaned))){
+          const count = Number(m[1]);
+          const faces = Number(m[2]);
+          if (!Number.isFinite(count) || count<=0) return null;
+          if (!facesAllowed.includes(String(faces))) return null;
+          min += count * 1;
+          max += count * faces;
+          avg += count * ((faces + 1) / 2);
+        }
+        return { min, max, average: avg };
+      }
+      function fmtPX(v){const n=Number(v);return Number.isFinite(n)?new Intl.NumberFormat('es-ES').format(n):String(v??'-')}
+      function fmtCasillas(v){const n=Number(v);if(!Number.isFinite(n)) return String(v??'-'); return n+' '+(n===1?'Casilla':'Casillas')}
+      function crearCard(b){
+        const el = document.createElement('article');
+        el.className = 'card';
+        el.innerHTML = `
+          <div class="card-header">
+            <img class="card-img" src="${b.imagen ?? ''}" alt="${b.nombre ?? ''}" />
+            <div class="card-title">
+              <div class="name">${b.nombre ?? ''}</div>
+              <span class="badge">${b.categoria ?? ''}</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="stats">
+              <div class="stat"><b>Daño</b><div class="value">${b.dano_texto ?? (b.dano ?? '-')}</div></div>
+              <div class="stat"><b>C.A.</b><div class="value">${b.ca ?? '-'}</div></div>
+              <div class="stat"><b>Vitalidad</b><div class="value">${b.vitalidad ?? '-'}</div></div>
+              <div class="stat"><b>PX</b><div class="value">${fmtPX(b.px)}</div></div>
+              <div class="stat"><b>Movimiento</b><div class="value">${fmtCasillas(b.movimiento)}</div></div>
+              <div class="stat"><b>Rango alcance</b><div class="value">${fmtCasillas(b.dano_alcance)}</div></div>
+            </div>
+          </div>
+        `;
+        el.addEventListener('click', () => {
+          const slug = slugify(b.nombre);
+          if (!slug) return;
+          location.href = 'detalle.html?id=' + encodeURIComponent(slug) + '&cat=' + encodeURIComponent(cat);
+        });
+        return el;
+      }
+      function filtrarPorCategoria(arr){
+        if (String(cat).toLowerCase() === 'todas') return arr;
+        return arr.filter(b => (b.categoria||'').toLowerCase() === String(cat).toLowerCase());
+      }
+      function render(){
+        cardsEl.innerHTML = '';
+        const q = (searchInput.value||'').trim().toLowerCase();
+        const base = filtrarPorCategoria(list);
+        const filtradas = base.filter(b => !q || (b.nombre||'').toLowerCase().includes(q));
+        catTitle.textContent = String(cat);
+        const catCount = document.getElementById('catCount');
+        if (catCount) catCount.textContent = `${filtradas.length} bestias`;
+        for(const b of filtradas){ cardsEl.appendChild(crearCard(b)); }
+      }
+      searchInput.addEventListener('input', render);
+      render();
+    </script>
+  </body>
+</html>

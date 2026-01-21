@@ -31,7 +31,7 @@
 
       .app{
         display:grid;
-        grid-template-columns: 260px 1fr;
+        grid-template-columns: 1fr;
         min-height:100dvh;
       }
       aside.sidebar{
@@ -59,6 +59,7 @@
         cursor:pointer;
         font-weight:600;
         transition: border-color .2s, box-shadow .2s, transform .04s;
+        display:block;
       }
       .cat-btn:hover{border-color:#cbd5e1}
       .cat-btn.active{
@@ -74,6 +75,8 @@
         transition: border-color .2s, box-shadow .2s, transform .04s;
       }
       .nav-link:hover{ border-color:#cbd5e1 }
+      .home-sections{ display:grid; grid-template-columns: repeat(2, minmax(260px,1fr)); gap:16px; align-items:start; margin-top:12px }
+      .home-block{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px }
 
       main.content{
         padding:20px;
@@ -124,6 +127,8 @@
         border-radius:12px;
         padding:10px 12px;
       }
+      .hero{ margin-bottom:12px }
+      .site-title{ margin:0; font-size:1.6rem; font-weight:800 }
       .filters summary{cursor:pointer; font-weight:700}
       .filters-grid{
         display:grid;
@@ -139,18 +144,14 @@
       .filters label{font-size:.85rem; color:var(--muted)}
 
       .results-bar{
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
+        display:none;
         margin:14px 0;
         color:var(--muted);
         font-size:.95rem;
       }
 
       .cards{
-        display:grid;
-        grid-template-columns: repeat(3, minmax(280px, 1fr));
-        gap:16px;
+        display:none;
       }
 
       .card{
@@ -252,54 +253,47 @@
 
       @media (max-width: 1024px){
         .app{ grid-template-columns: 1fr }
-        aside.sidebar{ position:fixed; left:0; top:0; bottom:0; width:86vw; max-width:320px; transform:translateX(-100%); transition:transform .25s; z-index:30 }
-        aside.sidebar.open{ transform:translateX(0) }
-        .cards{ grid-template-columns: repeat(2, minmax(240px, 1fr)) }
+        .home-sections{ grid-template-columns: 1fr }
       }
       @media (max-width: 640px){
-        .cards{ grid-template-columns: 1fr }
         .filters-grid{ grid-template-columns: repeat(2, minmax(140px,1fr)) }
-        .stats{ grid-template-columns: 1fr 1fr }
-        .card-header{ grid-template-columns: 100px 1fr }
+        .home-sections{ grid-template-columns: 1fr }
       }
       @media (max-width: 480px){
-        .stats{ grid-template-columns: 1fr }
+        .home-sections{ grid-template-columns: 1fr }
       }
     </style>
   </head>
   <body>
     <div class="app">
-      <aside id="sidebar" class="sidebar">
-        <div class="brand">Bestias</div>
-        <div class="cat-list" id="catList">
-          <button class="cat-btn active" data-cat="Todas">Todas</button>
-          <button class="cat-btn" data-cat="Categoría 1">Categoría 1</button>
-          <button class="cat-btn" data-cat="Categoría 2">Categoría 2</button>
-          <button class="cat-btn" data-cat="Categoría 3">Categoría 3</button>
-          <button class="cat-btn" data-cat="Categoría 4">Categoría 4</button>
-        </div>
-        <div class="nav-section">
-          <div class="nav-title">Personajes</div>
-          <a class="nav-link" href="plantillas.html">Plantillas de Fichas</a>
-          <a class="nav-link" href="tus_fichas.html">Tus fichas</a>
-        </div>
-        <a class="nav-link" href="tus_bestias.html">Tus bestias</a>
-      </aside>
-      <div id="overlay" class="overlay"></div>
       <main class="content">
-        <div class="toolbar">
-          <button id="openSidebarBtn" class="btn" aria-controls="sidebar" aria-expanded="false">Menú</button>
-          <div class="search">
-            <span>🔎</span>
-            <input id="searchInput" type="search" placeholder="Buscar por nombre..." aria-label="Buscar bestias por nombre" />
-          </div>
-          <button id="clearBtn" class="btn">Limpiar filtro</button>
-        </div>
+        <header class="hero">
+          <h1 class="site-title">TerBes · Bestiario y Gestor de Aventuras</h1>
+        </header>
 
         <div class="filters">
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <strong>¿Necesitas más filtros?</strong>
             <a class="btn primary" href="filtros.html" aria-label="Ir a búsqueda avanzada">Búsqueda avanzada</a>
+          </div>
+        </div>
+
+        <div class="home-sections">
+          <div class="home-block">
+            <div class="nav-title">Categorías</div>
+            <div id="catListMain" class="cat-list">
+              <a class="cat-btn active" data-cat="Todas" href="categories.html?cat=Todas">Todas</a>
+              <a class="cat-btn" data-cat="Categoría 1" href="categories.html?cat=Categor%C3%ADa%201">Categoría 1</a>
+              <a class="cat-btn" data-cat="Categoría 2" href="categories.html?cat=Categor%C3%ADa%202">Categoría 2</a>
+              <a class="cat-btn" data-cat="Categoría 3" href="categories.html?cat=Categor%C3%ADa%203">Categoría 3</a>
+              <a class="cat-btn" data-cat="Categoría 4" href="categories.html?cat=Categor%C3%ADa%204">Categoría 4</a>
+            </div>
+          </div>
+          <div class="home-block">
+            <div class="nav-title">Personajes</div>
+            <a class="nav-link" href="plantillas.html">Plantillas de Fichas</a>
+            <a class="nav-link" href="tus_fichas.html">Tus fichas</a>
+            <a class="nav-link" href="tus_bestias.html">Tus bestias</a>
           </div>
         </div>
 
@@ -325,11 +319,7 @@
       const sortAttr = document.getElementById('sortAttr');
       const sortDir = document.getElementById('sortDir');
       const clearBtn = document.getElementById('clearBtn');
-      const catList = document.getElementById('catList');
-      const sidebarEl = document.getElementById('sidebar');
-      const overlayEl = document.getElementById('overlay');
-      const openSidebarBtn = document.getElementById('openSidebarBtn');
-      const filters = null; // filtros avanzados se usan en filtros.html
+      const filters = null;
       let currentCategory = 'Todas';
 
       const attrMap = {
@@ -430,7 +420,7 @@
       }
 
       function filtrar(lista){
-        const q = (searchInput.value || '').trim().toLowerCase();
+        const q = ((searchInput && searchInput.value) || '').trim().toLowerCase();
         return lista.filter(b => {
           if (norm(currentCategory) !== 'todas' && (norm(b.categoria) !== norm(currentCategory))) return false;
           if (q && !(b.nombre || '').toLowerCase().includes(q)) return false;
@@ -534,20 +524,9 @@
       }
 
       function render(){
-        cardsEl.innerHTML = '';
         const filtradas = filtrar(bestias);
         const ordenadas = ordenar(filtradas);
-        resultCountEl.textContent = `${ordenadas.length} resultado${ordenadas.length!==1?'s':''}`;
-        if (ordenadas.length === 0){
-          const empty = document.createElement('div');
-          empty.className = 'empty';
-          empty.textContent = 'No hay bestias para mostrar. Agrega tus datos en el JSON.';
-          cardsEl.appendChild(empty);
-          return;
-        }
-        for(const b of ordenadas){
-          cardsEl.appendChild(crearCard(b));
-        }
+        if (resultCountEl) resultCountEl.textContent = `${ordenadas.length} resultado${ordenadas.length!==1?'s':''}`;
       }
 
       function openSidebar(){
@@ -564,17 +543,16 @@
       // ===============================
       // Eventos UI
       // ===============================
-      searchInput.addEventListener('input', render);
+      if (searchInput) searchInput.addEventListener('input', render);
       if (sortAttr) sortAttr.addEventListener('change', render);
       if (sortDir) sortDir.addEventListener('change', render);
-      clearBtn.addEventListener('click', () => {
+      if (clearBtn) clearBtn.addEventListener('click', () => {
         searchInput.value = '';
         if (sortAttr) sortAttr.value = '';
         if (sortDir) sortDir.value = 'asc';
         currentCategory = 'Todas';
         document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat==='Todas'));
         render();
-        closeSidebar();
       });
 
       document.querySelectorAll('.cat-btn').forEach(btn => {
@@ -582,17 +560,11 @@
           currentCategory = btn.dataset.cat;
           document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b===btn));
           render();
-          closeSidebar();
         });
       });
 
-      openSidebarBtn.addEventListener('click', openSidebar);
-      overlayEl.addEventListener('click', closeSidebar);
-      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeSidebar(); });
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') {} });
 
-      // filtros avanzados no disponibles en index
-
-      // Primera renderización (lista vacía)
       render();
     </script>
   </body>

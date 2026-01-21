@@ -18,6 +18,7 @@
         background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden
       }
       .head{display:grid;grid-template-columns: 240px 1fr;gap:16px;padding:16px;border-bottom:1px solid var(--border)}
+      .head.no-img{grid-template-columns: 1fr}
       .img{width:100%;height:100%;max-height:220px;object-fit:cover;border-radius:12px;background:#f1f5f9}
       .name{font-size:1.6rem;font-weight:800;margin:0}
       .badge{display:inline-block;margin-top:8px;padding:6px 10px;border-radius:999px;border:1px solid #e5e7eb;font-weight:700}
@@ -38,7 +39,7 @@
   <body>
     <div class="wrap">
       <div class="top">
-        <a class="back" href="index.html">← Volver</a>
+        <a id="backBtn" class="back" href="index.html">← Volver</a>
         <strong>Ficha de bestia</strong>
       </div>
       <article class="card" id="card">
@@ -77,36 +78,80 @@
       function items(s){
         return String(s||'').split(/[.\n;•]+/).map(t=>t.trim()).filter(Boolean);
       }
+      function fmtPX(v){
+        const n = Number(v);
+        return Number.isFinite(n) ? new Intl.NumberFormat('es-ES').format(n) : String(v ?? '-');
+      }
+      function fmtCasillas(v){
+        const n = Number(v);
+        if (!Number.isFinite(n)) return String(v ?? '-');
+        return n + ' ' + (n===1?'Casilla':'Casillas');
+      }
       const params = new URLSearchParams(location.search);
       const id = params.get('id');
       const list = Array.isArray(window.bestias) ? window.bestias : JSON.parse(localStorage.getItem('bestias')||'[]');
       const item = list.find(b => slugify(b.nombre) === id);
+      const catParam = params.get('cat');
+      const backBtn = document.getElementById('backBtn');
+      if (backBtn){
+        if (catParam){
+          backBtn.href = 'categories.html?cat=' + encodeURIComponent(catParam);
+        } else if (item && item.categoria){
+          backBtn.href = 'categories.html?cat=' + encodeURIComponent(item.categoria);
+        } else {
+          backBtn.href = 'index.html';
+        }
+      }
       if(!item){
         document.getElementById('name').textContent = 'Bestia no encontrada';
       } else {
-        document.getElementById('img').src = item.imagen || '';
-        document.getElementById('img').alt = item.nombre || '';
+        const imgEl = document.getElementById('img');
+        const headEl = document.querySelector('.head');
+        if (item.imagen){
+          imgEl.src = item.imagen;
+          imgEl.alt = item.nombre || '';
+          imgEl.style.display = '';
+        } else {
+          imgEl.style.display = 'none';
+          if (headEl) headEl.classList.add('no-img');
+        }
         document.getElementById('name').textContent = item.nombre || '';
         document.getElementById('cat').textContent = item.categoria || '';
         document.getElementById('dano').textContent = item.dano_texto ?? (item.dano ?? '-');
         document.getElementById('ca').textContent = item.ca ?? '-';
         document.getElementById('vitalidad').textContent = item.vitalidad ?? '-';
-        document.getElementById('px').textContent = item.px ?? '-';
-        document.getElementById('movimiento').textContent = item.movimiento ?? '-';
-        document.getElementById('alcance').textContent = item.dano_alcance ?? '-';
+        document.getElementById('px').textContent = fmtPX(item.px);
+        document.getElementById('movimiento').textContent = fmtCasillas(item.movimiento);
+        document.getElementById('alcance').textContent = fmtCasillas(item.dano_alcance);
         const fortEl = document.getElementById('fortalezas');
         fortEl.innerHTML = '';
         const fortUl = document.createElement('ul');
-        for(const p of items(item.fortalezas)) { const li=document.createElement('li'); li.textContent=p; fortUl.appendChild(li); }
-        fortEl.appendChild(fortUl);
+        const fortItems = items(item.fortalezas);
+        if (fortItems.length){
+          for(const p of fortItems) { const li=document.createElement('li'); li.textContent=p; fortUl.appendChild(li); }
+          fortEl.appendChild(fortUl);
+        } else {
+          fortEl.parentElement.style.display = 'none';
+        }
         const debEl = document.getElementById('debilidades');
         debEl.innerHTML = '';
         const debUl = document.createElement('ul');
-        for(const p of items(item.debilidades)) { const li=document.createElement('li'); li.textContent=p; debUl.appendChild(li); }
-        debEl.appendChild(debUl);
-        document.getElementById('localizacion').textContent = item.localizacion ?? '';
-        document.getElementById('alineamiento').textContent = item.alineamiento ?? '';
-        document.getElementById('descripcion').textContent = item.descripcion ?? '';
+        const debItems = items(item.debilidades);
+        if (debItems.length){
+          for(const p of debItems) { const li=document.createElement('li'); li.textContent=p; debUl.appendChild(li); }
+          debEl.appendChild(debUl);
+        } else {
+          debEl.parentElement.style.display = 'none';
+        }
+        const loc = String(item.localizacion||'').trim();
+        const ali = String(item.alineamiento||'').trim();
+        const des = String(item.descripcion||'').trim();
+        document.getElementById('localizacion').textContent = loc;
+        document.getElementById('alineamiento').textContent = ali;
+        document.getElementById('descripcion').textContent = des;
+        if (!loc) document.getElementById('localizacion').parentElement.style.display='none';
+        if (!ali) document.getElementById('alineamiento').parentElement.style.display='none';
+        if (!des) document.getElementById('descripcion').parentElement.style.display='none';
       }
     </script>
   </body>

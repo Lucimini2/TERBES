@@ -239,7 +239,8 @@
         el.addEventListener('click', ()=>{
           const slug = slugify(b.nombre);
           if (!slug) return;
-          location.href = 'detalle.html?id=' + encodeURIComponent(slug);
+          const cat = currentCategory || 'Todas';
+          location.href = 'detalle.html?id=' + encodeURIComponent(slug) + '&cat=' + encodeURIComponent(cat);
         });
         return el;
       }
