@@ -53,14 +53,7 @@
             </div>
           </div>
 
-          <div class="question">
-            <label>Daño</label>
-            <div class="hint">Rango opcional</div>
-            <div style="display:flex;gap:8px">
-              <input id="f_dano_min" class="num" type="number" placeholder="min" />
-              <input id="f_dano_max" class="num" type="number" placeholder="max" />
-            </div>
-          </div>
+          
 
           <div class="question">
             <label>Vitalidad</label>
@@ -104,8 +97,6 @@
             <div style="display:flex;gap:8px;flex-wrap:wrap">
               <select id="sortAttr" class="select">
                 <option value="">Ordenar por…</option>
-                <option value="nombre">Nombre</option>
-                <option value="dano">Daño</option>
                 <option value="ca">C.A.</option>
                 <option value="vitalidad">Vitalidad</option>
                 <option value="px">PX</option>
@@ -141,7 +132,6 @@
       let currentCategory = 'Todas';
       const catGroup = document.getElementById('catGroup');
       const filters = {
-        dano: {min: document.getElementById('f_dano_min'), max: document.getElementById('f_dano_max')},
         vitalidad: {min: document.getElementById('f_vitalidad_min'), max: document.getElementById('f_vitalidad_max')},
         px: {min: document.getElementById('f_px_min'), max: document.getElementById('f_px_max')},
         movimiento: {min: document.getElementById('f_mov_min'), max: document.getElementById('f_mov_max')},
@@ -154,6 +144,43 @@
         const n = Number(s);
         return Number.isFinite(n) ? n : null;
       }
+      // Analizador de daño D&D 5e
+      // - Formatos válidos: "XdY" o "XdY + AdB + ..." (con o sin espacios alrededor del '+')
+      // - Dados permitidos: d3, d4, d6, d8, d10, d12, d20, d100
+      // - No admite modificadores planos (+3), multiplicadores ni restas
+      // - Ignora descripciones entre paréntesis en el texto original (p. ej. "(Mordisco)")
+      // Devuelve un objeto con { min, max, average } o null si el formato es inválido
+      function parseDamage(expr){
+        const facesAllowed = ['3','4','6','8','10','12','20','100'];
+        if (typeof expr !== 'string') return null;
+        const cleaned = expr.toLowerCase().replace(/\([^)]*\)/g,'').trim();
+        if (!cleaned) return null;
+        const valid = /^\s*(\d+\s*d\s*(3|4|6|8|10|12|20|100))(\s*\+\s*\d+\s*d\s*(3|4|6|8|10|12|20|100))*\s*$/.test(cleaned);
+        if (!valid) return null;
+        let min = 0, max = 0, avg = 0;
+        const re = /(\d+)\s*d\s*(3|4|6|8|10|12|20|100)/g;
+        let m;
+        while ((m = re.exec(cleaned))){
+          const count = Number(m[1]);
+          const faces = Number(m[2]);
+          if (!Number.isFinite(count) || count<=0) return null;
+          if (!facesAllowed.includes(String(faces))) return null;
+          min += count * 1;
+          max += count * faces;
+          avg += count * ((faces + 1) / 2);
+        }
+        return { min, max, average: avg };
+      }
+      // Obtiene estadísticas de daño de una bestia a partir de su texto de daño.
+      // Si no hay texto válido, usa el campo numérico 'dano' como fallback.
+      function damageStatsOf(b){
+        const stats = parseDamage(b.dano_texto||'');
+        if (stats) return stats;
+        const n = Number(b.dano);
+        if (Number.isFinite(n)) return { min:n, max:n, average:n };
+        return null;
+      }
+      // Verifica si 'value' cae dentro del rango [min,max] provisto por inputs
       function pasaRango(value,minEl,maxEl){
         const v = Number(value);
         if (!Number.isFinite(v)) return true;
@@ -170,7 +197,6 @@
           if (String(currentCategory).toLowerCase() !== 'todas') {
             if ((b.categoria||'').toLowerCase() !== (currentCategory||'').toLowerCase()) return false;
           }
-          if(!pasaRango(b.dano,filters.dano.min,filters.dano.max)) return false;
           if(!pasaRango(b.vitalidad,filters.vitalidad.min,filters.vitalidad.max)) return false;
           if(!pasaRango(b.px,filters.px.min,filters.px.max)) return false;
           if(!pasaRango(b.movimiento,filters.movimiento.min,filters.movimiento.max)) return false;
@@ -182,7 +208,8 @@
         const key = attrMap[sortAttr.value]; const dir = sortDir.value==='desc'?-1:1;
         if(!key) return lista;
         return [...lista].sort((a,b)=>{
-          const va=a[key], vb=b[key];
+          const va = key==='dano' ? (damageStatsOf(a)?.average ?? null) : a[key];
+          const vb = key==='dano' ? (damageStatsOf(b)?.average ?? null) : b[key];
           if(typeof va==='number' && typeof vb==='number') return (va-vb)*dir;
           const sa=String(va??'').toLowerCase(); const sb=String(vb??'').toLowerCase();
           if(sa<sb) return -1*dir; if(sa>sb) return 1*dir; return 0;

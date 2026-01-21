@@ -201,8 +201,8 @@
       }
       .stats{
         display:grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap:12px;
+        grid-template-columns: repeat(3, minmax(0,1fr));
+        gap:16px;
       }
       .stat{
         background:#f8fafc;
@@ -228,6 +228,14 @@
         text-align:center;
       }
 
+      .card > .stats, .card > .extra{ padding:16px; box-sizing:border-box }
+      .card-body > .stats, .card-body > .extra{ padding:8px; box-sizing:border-box }
+      .stat{ display:flex; flex-direction:column; justify-content:center; min-height:88px; min-width:0; word-break:break-word }
+      .stat b{ white-space:normal; overflow-wrap:anywhere; word-break:break-word }
+      .stat .value, .stat .stat-value{
+        display:block; overflow-wrap:anywhere; word-break:break-word; max-width:100%; white-space:normal; overflow:visible
+      }
+
       .overlay{
         position:fixed;inset:0;background:rgba(0,0,0,.35);
         opacity:0;pointer-events:none;transition:opacity .2s;z-index:20
@@ -245,6 +253,9 @@
         .filters-grid{ grid-template-columns: repeat(2, minmax(140px,1fr)) }
         .stats{ grid-template-columns: 1fr 1fr }
         .card-header{ grid-template-columns: 100px 1fr }
+      }
+      @media (max-width: 480px){
+        .stats{ grid-template-columns: 1fr }
       }
     </style>
   </head>
@@ -269,20 +280,6 @@
             <span>🔎</span>
             <input id="searchInput" type="search" placeholder="Buscar por nombre..." aria-label="Buscar bestias por nombre" />
           </div>
-          <select id="sortAttr" class="sel" aria-label="Ordenar por atributo">
-            <option value="">Ordenar por…</option>
-            <option value="nombre">Nombre</option>
-            <option value="dano">Daño</option>
-            <option value="ca">C.A.</option>
-            <option value="vitalidad">Vitalidad</option>
-            <option value="px">PX</option>
-            <option value="movimiento">Movimiento</option>
-            <option value="dano_alcance">Rango alcance</option>
-          </select>
-          <select id="sortDir" class="sel" aria-label="Dirección de orden">
-            <option value="asc">Ascendente</option>
-            <option value="desc">Descendente</option>
-          </select>
           <button id="clearBtn" class="btn">Limpiar filtros</button>
         </div>
 
@@ -346,6 +343,53 @@
         const n = Number(val);
         return Number.isFinite(n) ? n : null;
       }
+      // Analizador de daño D&D 5e
+      // - Formatos válidos: "XdY" o "XdY + AdB + ..." (con o sin espacios alrededor del '+')
+      // - Dados permitidos: d3, d4, d6, d8, d10, d12, d20, d100
+      // - No admite modificadores planos (+3), multiplicadores ni restas
+      // - Ignora descripciones entre paréntesis en el texto original (p. ej. "(Mordisco)")
+      // Devuelve un objeto con { min, max, average } o null si el formato es inválido
+      function parseDamage(expr){
+        const facesAllowed = ['3','4','6','8','10','12','20','100'];
+        if (typeof expr !== 'string') return null;
+        const cleaned = expr
+          .toLowerCase()
+          .replace(/\([^)]*\)/g,'')        // quitar descripciones entre paréntesis
+          .trim();
+        if (!cleaned) return null;
+        const valid = /^\s*(\d+\s*d\s*(3|4|6|8|10|12|20|100))(\s*\+\s*\d+\s*d\s*(3|4|6|8|10|12|20|100))*\s*$/.test(cleaned);
+        if (!valid) return null;
+        let min = 0, max = 0, avg = 0;
+        const re = /(\d+)\s*d\s*(3|4|6|8|10|12|20|100)/g;
+        let m;
+        while ((m = re.exec(cleaned))){
+          const count = Number(m[1]);
+          const faces = Number(m[2]);
+          if (!Number.isFinite(count) || count<=0) return null;
+          if (!facesAllowed.includes(String(faces))) return null;
+          min += count * 1;
+          max += count * faces;
+          avg += count * ((faces + 1) / 2);
+        }
+        return { min, max, average: avg };
+      }
+      // Obtiene el valor promedio de daño de una bestia
+      // - Usa 'dano_texto' si el formato es válido
+      // - Si no, recurre a 'dano' numérico como fallback
+      function damageAverageOf(b){
+        const stats = parseDamage(b.dano_texto||'');
+        if (stats) return stats.average;
+        const n = Number(b.dano);
+        return Number.isFinite(n) ? n : null;
+      }
+      // Obtiene los stats de daño para filtros avanzados (o null si no se pueden calcular)
+      function damageStatsOf(b){
+        const stats = parseDamage(b.dano_texto||'');
+        if (stats) return stats;
+        const n = Number(b.dano);
+        if (Number.isFinite(n)) return { min:n, max:n, average:n };
+        return null;
+      }
       function bullets(text){
         const s = String(text||'').trim();
         if(!s) return '';
@@ -383,19 +427,29 @@
       }
 
       function ordenar(lista){
-        const key = attrMap[sortAttr.value];
-        const dir = sortDir.value === 'desc' ? -1 : 1;
+        const key = sortAttr ? attrMap[sortAttr.value] : null;
+        const dir = (sortDir && sortDir.value === 'desc') ? -1 : 1;
         if (!key) return lista;
         return [...lista].sort((a,b) => {
-          const va = a[key]; const vb = b[key];
-          if (typeof va === 'number' && typeof vb === 'number'){
-            return (va - vb) * dir;
+          const va = key==='dano' ? damageAverageOf(a) : a[key];
+          const vb = key==='dano' ? damageAverageOf(b) : b[key];
+          if (key==='dano'){
+            const an = typeof va === 'number';
+            const bn = typeof vb === 'number';
+            if (an && bn) return (va - vb) * dir;
+            if (an && !bn) return -1;
+            if (!an && bn) return 1;
+            return 0;
+          } else {
+            if (typeof va === 'number' && typeof vb === 'number'){
+              return (va - vb) * dir;
+            }
+            const sa = String(va ?? '').toLowerCase();
+            const sb = String(vb ?? '').toLowerCase();
+            if (sa < sb) return -1 * dir;
+            if (sa > sb) return  1 * dir;
+            return 0;
           }
-          const sa = String(va ?? '').toLowerCase();
-          const sb = String(vb ?? '').toLowerCase();
-          if (sa < sb) return -1 * dir;
-          if (sa > sb) return  1 * dir;
-          return 0;
         });
       }
 
@@ -425,29 +479,29 @@
           </div>
           <div class="card-body">
             <div class="stats">
-              <div class="bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
+              <div class="stat bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
                 <b class="block text-xs text-gray-500 font-semibold mb-1">Daño</b>
-                <div class="text-gray-900 font-semibold">${b.dano_texto ?? (b.dano ?? '-')}</div>
+                <div class="value text-gray-900 font-semibold">${b.dano_texto ?? (b.dano ?? '-')}</div>
               </div>
-              <div class="bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
+              <div class="stat bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
                 <b class="block text-xs text-gray-500 font-semibold mb-1">C.A.</b>
-                <div class="text-gray-900 font-semibold">${b.ca ?? '-'}</div>
+                <div class="value text-gray-900 font-semibold">${b.ca ?? '-'}</div>
               </div>
-              <div class="bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
+              <div class="stat bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
                 <b class="block text-xs text-gray-500 font-semibold mb-1">Vitalidad</b>
-                <div class="text-gray-900 font-semibold">${b.vitalidad ?? '-'}</div>
+                <div class="value text-gray-900 font-semibold">${b.vitalidad ?? '-'}</div>
               </div>
-              <div class="bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
+              <div class="stat bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
                 <b class="block text-xs text-gray-500 font-semibold mb-1">PX</b>
-                <div class="text-gray-900 font-semibold">${fmtPX(b.px)}</div>
+                <div class="value text-gray-900 font-semibold">${fmtPX(b.px)}</div>
               </div>
-              <div class="bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
+              <div class="stat bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
                 <b class="block text-xs text-gray-500 font-semibold mb-1">Movimiento</b>
-                <div class="text-gray-900 font-semibold">${fmtCasillas(b.movimiento)}</div>
+                <div class="value text-gray-900 font-semibold">${fmtCasillas(b.movimiento)}</div>
               </div>
-              <div class="bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
+              <div class="stat bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
                 <b class="block text-xs text-gray-500 font-semibold mb-1">Rango alcance</b>
-                <div class="text-gray-900 font-semibold">${fmtCasillas(b.dano_alcance)}</div>
+                <div class="value text-gray-900 font-semibold">${fmtCasillas(b.dano_alcance)}</div>
               </div>
             </div>
             <div class="extra hidden">
@@ -498,12 +552,12 @@
       // Eventos UI
       // ===============================
       searchInput.addEventListener('input', render);
-      sortAttr.addEventListener('change', render);
-      sortDir.addEventListener('change', render);
+      if (sortAttr) sortAttr.addEventListener('change', render);
+      if (sortDir) sortDir.addEventListener('change', render);
       clearBtn.addEventListener('click', () => {
         searchInput.value = '';
-        sortAttr.value = '';
-        sortDir.value = 'asc';
+        if (sortAttr) sortAttr.value = '';
+        if (sortDir) sortDir.value = 'asc';
         currentCategory = 'Todas';
         document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat==='Todas'));
         render();
