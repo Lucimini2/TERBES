@@ -228,9 +228,16 @@
         text-align:center;
       }
 
+      .overlay{
+        position:fixed;inset:0;background:rgba(0,0,0,.35);
+        opacity:0;pointer-events:none;transition:opacity .2s;z-index:20
+      }
+      .overlay.show{opacity:1;pointer-events:auto}
+
       @media (max-width: 1024px){
         .app{ grid-template-columns: 1fr }
-        aside.sidebar{ display:none }
+        aside.sidebar{ position:fixed; left:0; top:0; bottom:0; width:86vw; max-width:320px; transform:translateX(-100%); transition:transform .25s; z-index:30 }
+        aside.sidebar.open{ transform:translateX(0) }
         .cards{ grid-template-columns: repeat(2, minmax(240px, 1fr)) }
       }
       @media (max-width: 640px){
@@ -243,7 +250,7 @@
   </head>
   <body>
     <div class="app">
-      <aside class="sidebar">
+      <aside id="sidebar" class="sidebar">
         <div class="brand">Bestias</div>
         <div class="cat-hint">Filtra rápidamente por categoría</div>
         <div class="cat-list" id="catList">
@@ -254,8 +261,10 @@
           <button class="cat-btn" data-cat="Categoría 4">Categoría 4</button>
         </div>
       </aside>
+      <div id="overlay" class="overlay"></div>
       <main class="content">
         <div class="toolbar">
+          <button id="openSidebarBtn" class="btn" aria-controls="sidebar" aria-expanded="false">Categorías</button>
           <div class="search">
             <span>🔎</span>
             <input id="searchInput" type="search" placeholder="Buscar por nombre..." aria-label="Buscar bestias por nombre" />
@@ -307,6 +316,9 @@
       const sortDir = document.getElementById('sortDir');
       const clearBtn = document.getElementById('clearBtn');
       const catList = document.getElementById('catList');
+      const sidebarEl = document.getElementById('sidebar');
+      const overlayEl = document.getElementById('overlay');
+      const openSidebarBtn = document.getElementById('openSidebarBtn');
       const filters = null; // filtros avanzados se usan en filtros.html
       let currentCategory = 'Todas';
 
@@ -404,15 +416,15 @@
         const el = document.createElement('article');
         el.className = 'card rounded-2xl shadow-md hover:shadow-lg border border-gray-200 bg-white overflow-hidden transition cursor-pointer';
         el.innerHTML = `
-          <div class="grid grid-cols-[120px_1fr] gap-3 p-3 border-b border-gray-200 items-center">
-            <img class="w-full h-24 object-cover rounded-xl bg-slate-100" src="${b.imagen ?? ''}" alt="${b.nombre ?? ''}" />
-            <div class="flex flex-col gap-2">
-              <div class="font-extrabold text-lg text-gray-900">${b.nombre ?? ''}</div>
-              <span class="inline-flex items-center w-max px-3 py-1 rounded-full ring-1 ring-inset ${catClass(b.categoria)}">${b.categoria ?? ''}</span>
+          <div class="card-header">
+            <img class="card-img" src="${b.imagen ?? ''}" alt="${b.nombre ?? ''}" />
+            <div class="card-title">
+              <div class="name">${b.nombre ?? ''}</div>
+              <span class="badge ${catClass(b.categoria).replace(/ring-[^\\s]+/,'')}">${b.categoria ?? ''}</span>
             </div>
           </div>
-          <div class="p-4">
-            <div class="grid grid-cols-3 gap-3">
+          <div class="card-body">
+            <div class="stats">
               <div class="bg-slate-50 border border-gray-200 rounded-xl p-3 text-sm">
                 <b class="block text-xs text-gray-500 font-semibold mb-1">Daño</b>
                 <div class="text-gray-900 font-semibold">${b.dano_texto ?? (b.dano ?? '-')}</div>
@@ -471,6 +483,17 @@
         }
       }
 
+      function openSidebar(){
+        sidebarEl.classList.add('open');
+        overlayEl.classList.add('show');
+        openSidebarBtn.setAttribute('aria-expanded','true');
+      }
+      function closeSidebar(){
+        sidebarEl.classList.remove('open');
+        overlayEl.classList.remove('show');
+        openSidebarBtn.setAttribute('aria-expanded','false');
+      }
+
       // ===============================
       // Eventos UI
       // ===============================
@@ -484,6 +507,7 @@
         currentCategory = 'Todas';
         document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat==='Todas'));
         render();
+        closeSidebar();
       });
 
       document.querySelectorAll('.cat-btn').forEach(btn => {
@@ -491,8 +515,13 @@
           currentCategory = btn.dataset.cat;
           document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b===btn));
           render();
+          closeSidebar();
         });
       });
+
+      openSidebarBtn.addEventListener('click', openSidebar);
+      overlayEl.addEventListener('click', closeSidebar);
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeSidebar(); });
 
       // filtros avanzados no disponibles en index
 

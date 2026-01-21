@@ -17,8 +17,6 @@
 // }
 //
 // Nota: No se incluyen ejemplos adicionales para respetar tu petición.
-// Categoria 1: de linea 24 hasta linea 755
-// Categoria 2: de linea 755 hasta linea 1231
 
 window.bestias = [
   {
