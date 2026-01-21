@@ -66,6 +66,14 @@
         box-shadow:0 0 0 3px rgba(37,99,235,0.15);
       }
       .cat-hint{color:var(--muted); font-size:.9rem; margin-top:8px}
+      .nav-section{ margin-top:18px }
+      .nav-title{ font-weight:700; margin:14px 0 8px 0 }
+      .nav-link{
+        display:block; border:1px solid var(--border); background:#fff; padding:10px 12px;
+        border-radius:10px; text-align:left; cursor:pointer; font-weight:600; text-decoration:none; color:inherit; margin-bottom:8px;
+        transition: border-color .2s, box-shadow .2s, transform .04s;
+      }
+      .nav-link:hover{ border-color:#cbd5e1 }
 
       main.content{
         padding:20px;
@@ -263,7 +271,6 @@
     <div class="app">
       <aside id="sidebar" class="sidebar">
         <div class="brand">Bestias</div>
-        <div class="cat-hint">Filtra rápidamente por categoría</div>
         <div class="cat-list" id="catList">
           <button class="cat-btn active" data-cat="Todas">Todas</button>
           <button class="cat-btn" data-cat="Categoría 1">Categoría 1</button>
@@ -271,16 +278,22 @@
           <button class="cat-btn" data-cat="Categoría 3">Categoría 3</button>
           <button class="cat-btn" data-cat="Categoría 4">Categoría 4</button>
         </div>
+        <div class="nav-section">
+          <div class="nav-title">Personajes</div>
+          <a class="nav-link" href="plantillas.html">Plantillas de Fichas</a>
+          <a class="nav-link" href="tus_fichas.html">Tus fichas</a>
+        </div>
+        <a class="nav-link" href="tus_bestias.html">Tus bestias</a>
       </aside>
       <div id="overlay" class="overlay"></div>
       <main class="content">
         <div class="toolbar">
-          <button id="openSidebarBtn" class="btn" aria-controls="sidebar" aria-expanded="false">Categorías</button>
+          <button id="openSidebarBtn" class="btn" aria-controls="sidebar" aria-expanded="false">Menú</button>
           <div class="search">
             <span>🔎</span>
             <input id="searchInput" type="search" placeholder="Buscar por nombre..." aria-label="Buscar bestias por nombre" />
           </div>
-          <button id="clearBtn" class="btn">Limpiar filtros</button>
+          <button id="clearBtn" class="btn">Limpiar filtro</button>
         </div>
 
         <div class="filters">
