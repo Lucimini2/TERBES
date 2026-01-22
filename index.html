@@ -46,7 +46,8 @@
       }
       .cat-list{
         display:flex;
-        flex-direction:column;
+        flex-direction:row;
+        flex-wrap:wrap;
         gap:8px;
       }
       .cat-btn{
@@ -75,8 +76,29 @@
         transition: border-color .2s, box-shadow .2s, transform .04s;
       }
       .nav-link:hover{ border-color:#cbd5e1 }
-      .home-sections{ display:grid; grid-template-columns: repeat(2, minmax(260px,1fr)); gap:16px; align-items:start; margin-top:12px }
-      .home-block{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px }
+      .home-sections{ display:grid; grid-template-columns: 1fr; gap:16px; align-items:start; margin-top:12px }
+      .home-block{ background:transparent; border:none; border-radius:0; padding:0 }
+      .nav-links{ display:flex; gap:10px; flex-wrap:wrap; flex-direction:column }
+      .section-card{
+        display:grid; grid-template-columns: minmax(240px, 1fr) 1.2fr; gap:14px; align-items:start;
+        background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:14px; box-shadow: var(--shadow)
+      }
+      .section-card:hover{ box-shadow: 0 12px 28px rgba(0,0,0,0.10) }
+      .section-card.reverse{ grid-template-columns: 1.2fr minmax(240px, 1fr) }
+      .section-img{ width:100%; height:220px; object-fit:contain; object-position:center; border-radius:14px; background:#fff }
+      .section-img.personajes-sm{ height:200px }
+      .section-img.cat-large{ height:320px }
+      .section-items{ display:flex; gap:10px; flex-wrap:nowrap; flex-direction:column; align-content:flex-start }
+      .section-items.personajes-center{ align-self:stretch; justify-content:center }
+      .section-card .nav-link{ min-width:170px; width:100% }
+      .section-card .btn{ display:block; width:100%; text-align:left }
+      .cat-list{ display:flex; flex-direction:column; flex-wrap:nowrap; gap:10px }
+      .cat-btn{ min-width:150px; width:100%; text-align:left }
+      @media (max-width: 768px){
+        .section-card, .section-card.reverse{ grid-template-columns: 1fr }
+        .section-img{ height:220px }
+        .section-img.personajes-sm{ height:200px }
+      }
 
       main.content{
         padding:20px;
@@ -129,6 +151,21 @@
       }
       .hero{ margin-bottom:12px }
       .site-title{ margin:0; font-size:1.6rem; font-weight:800 }
+      .hero-banner{ position:relative; border-radius:12px; overflow:hidden }
+      .hero-img{ display:block; width:100%; height:280px; object-fit:cover }
+      .hero-title{
+        position:absolute; left:0; right:0; bottom:0;
+        padding:12px 16px;
+        color:#fff;
+        font-family:"Silver Garden", Georgia, "Times New Roman", serif;
+        font-weight:700;
+        font-size:2.2rem;
+        text-align:center;
+        text-shadow:0 2px 8px rgba(0,0,0,.35);
+        background:linear-gradient(to top, rgba(0,0,0,.45), rgba(0,0,0,0));
+      }
+      .site-footer{ margin-top:20px }
+      .footer-img{ display:block; width:100%; height:140px; object-fit:cover; object-position:center; border-radius:12px }
       .filters summary{cursor:pointer; font-weight:700}
       .filters-grid{
         display:grid;
@@ -268,32 +305,43 @@
     <div class="app">
       <main class="content">
         <header class="hero">
-          <h1 class="site-title">TerBes · Bestiario y Gestor de Aventuras</h1>
+          <div class="hero-banner">
+            <img class="hero-img" src="imgs2/header.png" alt="Encabezado" />
+            <h1 class="hero-title">TerBes · Bestiario y Gestor de Aventuras</h1>
+          </div>
         </header>
 
-        <div class="filters">
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <strong>¿Necesitas más filtros?</strong>
-            <a class="btn primary" href="filtros.html" aria-label="Ir a búsqueda avanzada">Búsqueda avanzada</a>
-          </div>
-        </div>
+        
 
         <div class="home-sections">
           <div class="home-block">
-            <div class="nav-title">Categorías</div>
-            <div id="catListMain" class="cat-list">
-              <a class="cat-btn active" data-cat="Todas" href="categories.html?cat=Todas">Todas</a>
-              <a class="cat-btn" data-cat="Categoría 1" href="categories.html?cat=Categor%C3%ADa%201">Categoría 1</a>
-              <a class="cat-btn" data-cat="Categoría 2" href="categories.html?cat=Categor%C3%ADa%202">Categoría 2</a>
-              <a class="cat-btn" data-cat="Categoría 3" href="categories.html?cat=Categor%C3%ADa%203">Categoría 3</a>
-              <a class="cat-btn" data-cat="Categoría 4" href="categories.html?cat=Categor%C3%ADa%204">Categoría 4</a>
+            <div class="nav-title">Personajes</div>
+            <div class="section-card">
+              <img class="section-img personajes-sm" src="imgs2/personajes.png" alt="Personajes" />
+              <div class="section-items personajes-center">
+                <div class="nav-links">
+                  <a class="nav-link" href="plantillas.html">Plantillas de Fichas</a>
+                  <a class="nav-link" href="tus_fichas.html">Tus fichas</a>
+                  <a class="nav-link" href="tus_bestias.html">Tus bestias</a>
+                </div>
+              </div>
             </div>
           </div>
           <div class="home-block">
-            <div class="nav-title">Personajes</div>
-            <a class="nav-link" href="plantillas.html">Plantillas de Fichas</a>
-            <a class="nav-link" href="tus_fichas.html">Tus fichas</a>
-            <a class="nav-link" href="tus_bestias.html">Tus bestias</a>
+            <div class="nav-title">Categorías</div>
+            <div class="section-card reverse">
+              <div class="section-items">
+                <div id="catListMain" class="cat-list">
+                  <a class="cat-btn active" data-cat="Todas" href="categories.html?cat=Todas">Todas</a>
+                  <a class="cat-btn" data-cat="Categoría 1" href="categories.html?cat=Categor%C3%ADa%201">Categoría 1</a>
+                  <a class="cat-btn" data-cat="Categoría 2" href="categories.html?cat=Categor%C3%ADa%202">Categoría 2</a>
+                  <a class="cat-btn" data-cat="Categoría 3" href="categories.html?cat=Categor%C3%ADa%203">Categoría 3</a>
+                  <a class="cat-btn" data-cat="Categoría 4" href="categories.html?cat=Categor%C3%ADa%204">Categoría 4</a>
+                </div>
+                <a class="btn primary" href="filtros.html" aria-label="Ir a búsqueda avanzada">Búsqueda avanzada</a>
+              </div>
+              <img class="section-img cat-large" src="imgs2/categorias.png" alt="Categorías" />
+            </div>
           </div>
         </div>
 
@@ -303,6 +351,9 @@
         </div>
 
         <div class="cards" id="cards"></div>
+        <footer class="site-footer">
+          <img class="footer-img" src="imgs2/footer.png" alt="Pie de página" />
+        </footer>
       </main>
     </div>
 
