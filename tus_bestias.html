@@ -10,8 +10,19 @@
       .wrap{margin:0 auto;padding:20px}
       .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px}
       h1{margin:0;font-size:1.6rem;font-weight:800}
+      h2{margin:0 0 10px 0;font-weight:800}
       .btn-back{display:inline-block;background:#eef2ff;border:1px solid var(--border);border-radius:10px;padding:8px 12px;text-decoration:none;color:#3730a3;font-weight:600}
       .back{margin-bottom:12px;display:flex}
+      .bestias-list{display:grid;gap:10px}
+      .bestia-item{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);border-radius:12px;padding:10px;background:var(--surface)}
+      .btn{display:inline-block;background:#fff;border:1px solid var(--border);border-radius:10px;padding:8px 12px;text-decoration:none;color:#111827;font-weight:600}
+      .search{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:#fff;color:var(--text)}
+      .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0b1020;color:#e5e7eb;border:1px solid #334155;border-radius:12px;padding:10px 14px;z-index:60;box-shadow:0 8px 20px rgba(0,0,0,.2)}
+      @media (prefers-color-scheme: dark){
+        :root{ --bg:#0f172a; --surface:#0b1020; --text:#e5e7eb; --border:#334155 }
+        body{background:var(--bg);color:var(--text)}
+        .btn{background:#0f172a;color:#e5e7eb;border-color:#334155}
+      }
     </style>
   </head>
   <body>
@@ -22,6 +33,154 @@
       <div class="card">
         <h1>Tus bestias</h1>
       </div>
+      <div class="card" style="margin-top:12px">
+        <h2>Bestias guardadas</h2>
+        <div style="margin:8px 0; display:grid; grid-template-columns: 1fr auto auto; gap:8px; align-items:center">
+          <input id="search-bestia" class="search" type="text" placeholder="Buscar por nombre o dueño" />
+          <select id="order-by" class="btn">
+            <option value="nombre">Nombre</option>
+            <option value="createdAt">Creación</option>
+            <option value="updatedAt">Edición</option>
+          </select>
+          <select id="order-dir" class="btn">
+            <option value="asc">Asc</option>
+            <option value="desc">Desc</option>
+          </select>
+        </div>
+        <div style="margin:8px 0; display:flex; gap:8px; flex-wrap:wrap">
+          <button id="export-all" class="btn" type="button">Exportar todas</button>
+        </div>
+        <div id="bestias-list" class="bestias-list"></div>
+      </div>
     </div>
+    <script>
+      (function(){
+        const LIST_KEY = 'tus-bestias';
+        function getList(){
+          const raw = localStorage.getItem(LIST_KEY);
+          let arr = [];
+          try{ arr = JSON.parse(raw||'[]') || []; }catch(e){ arr = []; }
+          return Array.isArray(arr) ? arr : [];
+        }
+        function setList(arr){
+          localStorage.setItem(LIST_KEY, JSON.stringify(Array.isArray(arr)?arr:[]));
+        }
+        function norm(s){
+          return String(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+        }
+        function showToast(msg){
+          const d = document.createElement('div'); d.className='toast'; d.textContent='✓ ' + String(msg||'');
+          d.setAttribute('role','status'); d.setAttribute('aria-live','polite'); d.setAttribute('aria-atomic','true');
+          document.body.appendChild(d); setTimeout(()=>{ d.remove(); }, 2000);
+        }
+        function download(item){
+          const blob = new Blob([JSON.stringify(item.data||{},null,2)], {type:'application/json'});
+          const a = document.createElement('a');
+          const name = (item.nombre && String(item.nombre).trim()) || 'ficha-mascota';
+          a.href = URL.createObjectURL(blob);
+          a.download = name + '.json';
+          document.body.appendChild(a); a.click(); a.remove();
+        }
+        function removeItem(item){
+          const list = getList().filter(it => it.id !== item.id);
+          setList(list);
+          showToast('Ficha de mascota eliminada');
+        }
+        function exportAll(){
+          const list = getList().filter(it => String(it?.nombre||'').trim().length > 0);
+          const payload = list.map(it => ({ id: it.id, nombre: it.nombre, dueno: it.dueno, gremio: it.gremio, createdAt: it.createdAt, updatedAt: it.updatedAt, data: it.data }));
+          const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = 'fichas-mascota.json';
+          document.body.appendChild(a); a.click(); a.remove();
+          showToast('Exportadas todas las bestias');
+        }
+        function duplicateItem(item){
+          const list = getList();
+          const id = 'p-' + Date.now() + '-' + Math.floor(Math.random()*1e6);
+          const nombre = (String(item.nombre||'').trim() || 'Sin nombre') + ' (copia)';
+          const copy = {
+            id,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            nombre,
+            dueno: item.dueno,
+            gremio: item.gremio,
+            data: JSON.parse(JSON.stringify(item.data||{}))
+          };
+          list.push(copy);
+          setList(list);
+          showToast('Ficha de mascota duplicada');
+        }
+        let searchTerm = '';
+        let orderBy = 'nombre';
+        let orderDir = 'asc';
+        const searchInput = document.getElementById('search-bestia');
+        const orderBySel = document.getElementById('order-by');
+        const orderDirSel = document.getElementById('order-dir');
+        const exportAllBtn = document.getElementById('export-all');
+        if(searchInput){
+          searchInput.addEventListener('input', function(){
+            searchTerm = String(searchInput.value||'');
+            render();
+          });
+        }
+        if(orderBySel){ orderBySel.addEventListener('change', function(){ orderBy = orderBySel.value; render(); }); }
+        if(orderDirSel){ orderDirSel.addEventListener('change', function(){ orderDir = orderDirSel.value; render(); }); }
+        if(exportAllBtn){ exportAllBtn.addEventListener('click', exportAll); }
+        function render(){
+          const el = document.getElementById('bestias-list');
+          const q = norm(searchTerm);
+          let list = getList().filter(it => norm(it.nombre).includes(q) || norm(it.dueno||'').includes(q));
+          list = [...list].sort((a,b) => {
+            let va, vb;
+            if(orderBy==='nombre'){
+              va = String(a.nombre||'').toLowerCase();
+              vb = String(b.nombre||'').toLowerCase();
+            } else if(orderBy==='updatedAt'){
+              va = Number(a.updatedAt||0);
+              vb = Number(b.updatedAt||0);
+            } else {
+              va = Number(a.createdAt||0);
+              vb = Number(b.createdAt||0);
+            }
+            if(typeof va === 'number' && typeof vb === 'number'){
+              return (va - vb) * (orderDir==='desc'?-1:1);
+            }
+            if(va < vb) return (orderDir==='desc'?-1:1) * -1;
+            if(va > vb) return (orderDir==='desc'?-1:1) * 1;
+            return 0;
+          });
+          el.innerHTML = '';
+          if(!list.length){
+            const p = document.createElement('p');
+            p.textContent = 'No hay bestias guardadas.';
+            el.appendChild(p);
+            return;
+          }
+          for(const it of list){
+            const row = document.createElement('div'); row.className = 'bestia-item';
+            const left = document.createElement('div');
+            const title = document.createElement('div'); title.style.fontWeight='800'; title.textContent = (it.nombre && String(it.nombre).trim()) || 'Sin nombre';
+            const sub = document.createElement('div'); sub.style.color='#6b7280'; sub.textContent = it.dueno ? ('Dueño: ' + it.dueno + (it.gremio ? (' · ' + it.gremio) : '')) : (it.gremio||'');
+            left.appendChild(title); left.appendChild(sub);
+            const actions = document.createElement('div'); actions.style.display='flex'; actions.style.gap='8px';
+            const edit = document.createElement('a'); edit.className='btn'; edit.href='plantillas.html?petId=' + encodeURIComponent(it.id); edit.textContent='Editar';
+            const view = document.createElement('a'); view.className='btn'; view.href='plantillas.html?petId=' + encodeURIComponent(it.id) + '&view=1'; view.textContent='Ver';
+            const dl = document.createElement('button'); dl.className='btn'; dl.type='button'; dl.textContent='Descargar';
+            dl.addEventListener('click', function(){ download(it); });
+            const dup = document.createElement('button'); dup.className='btn'; dup.type='button'; dup.textContent='Duplicar';
+            dup.addEventListener('click', function(){ duplicateItem(it); render(); });
+            const del = document.createElement('button'); del.className='btn'; del.type='button'; del.textContent='Eliminar';
+            del.addEventListener('click', function(){ removeItem(it); render(); });
+            actions.appendChild(edit); actions.appendChild(view); actions.appendChild(dl); actions.appendChild(dup); actions.appendChild(del);
+            row.appendChild(left); row.appendChild(actions);
+            el.appendChild(row);
+          }
+        }
+        render();
+      })();
+    </script>
   </body>
 </html>
