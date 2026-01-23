@@ -43,6 +43,9 @@
       .preview{width:160px;height:160px;object-fit:contain;object-position:center;border:none;background:transparent;border-radius:12px}
       .total{font-weight:800}
       .invalid{border-color:#ef4444;background:#fee2e2}
+      .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:10px 14px;z-index:60;box-shadow:0 8px 20px rgba(0,0,0,.1)}
+      .view-mode .form-actions{display:none !important}
+      .view-mode #card-header, .view-mode #card-gallery{display:none !important}
       :focus-visible{outline:3px solid #2563eb;outline-offset:2px}
       @media (max-width:900px){ .weapon-row, .weapon-head{grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr} }
       @media (max-width:640px){ .grid-2{grid-template-columns:1fr} .grid-3{grid-template-columns:1fr} .list-6{grid-template-columns:1fr} }
@@ -65,14 +68,14 @@
       <div class="back">
         <a class="btn-back" href="index.html">← Volver</a>
       </div>
-      <div class="card">
+      <div class="card" id="card-header">
         <h1>Plantillas de Fichas</h1>
       </div>
-      <div class="card" style="margin-top:12px">
+      <div class="card" id="card-gallery" style="margin-top:12px">
         <h2 style="margin:0 0 10px 0">Galería</h2>
         <div id="gallery" class="gallery"></div>
       </div>
-      <div class="card" style="margin-top:12px">
+      <div class="card" id="card-form" style="margin-top:12px">
         <h2 style="margin:0 0 10px 0">Crea tu ficha de personaje</h2>
         <form id="ficha-form">
           <fieldset>
@@ -351,6 +354,15 @@
           const slider = document.getElementById('rango-slider');
           const out = document.getElementById('rango-valor');
           if(slider && out){ out.textContent = String(slider.value || ''); }
+        }
+        function showToast(msg){
+          const d = document.createElement('div'); d.className='toast'; d.textContent=String(msg||'');
+          document.body.appendChild(d);
+          setTimeout(()=>{ d.remove(); }, 1800);
+        }
+        function setReadOnlyMode(on){
+          const ctrls = form.querySelectorAll('input, select, textarea, button');
+          ctrls.forEach(el => { el.disabled = !!on; });
         }
         function updateCargaTotal(){
           const pesos = form.querySelectorAll('.equipo-peso');
@@ -674,7 +686,7 @@
         const btnDelMascota = document.getElementById('btn-del-mascota');
         const btnDelArma = document.getElementById('btn-del-arma');
         const btnDelEquipo = document.getElementById('btn-del-equipo');
-        if(btnGuardar) btnGuardar.addEventListener('click', saveToLocal);
+        if(btnGuardar) btnGuardar.addEventListener('click', function(){ saveToLocal(); showToast('Ficha guardada'); });
         if(btnLimpiar) btnLimpiar.addEventListener('click', function(){
           form.reset();
           const retrato = document.getElementById('retrato-preview'); if(retrato) retrato.src = '';
@@ -718,6 +730,8 @@
           const params = new URLSearchParams(location.search);
           const fid = params.get('fichaId');
           if(fid) loadFromListById(fid); else loadFromLocal();
+          const view = params.get('view');
+          if(view){ setReadOnlyMode(true); document.body.classList.add('view-mode'); }
         })();
       })();
     </script>

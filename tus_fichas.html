@@ -15,6 +15,8 @@
       .fichas-list{display:grid;gap:10px}
       .ficha-item{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);border-radius:12px;padding:10px;background:var(--surface)}
       .btn{display:inline-block;background:#fff;border:1px solid var(--border);border-radius:10px;padding:8px 12px;text-decoration:none;color:#111827;font-weight:600}
+      .search{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:#fff;color:var(--text)}
+      .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:10px 14px;z-index:60;box-shadow:0 8px 20px rgba(0,0,0,.1)}
       @media (prefers-color-scheme: dark){
         :root{ --bg:#0f172a; --surface:#0b1020; --text:#e5e7eb; --border:#334155 }
         body{background:var(--bg);color:var(--text)}
@@ -32,29 +34,35 @@
       </div>
       <div class="card" style="margin-top:12px">
         <h2 style="margin:0 0 10px 0">Fichas guardadas</h2>
+        <div style="margin:8px 0"><input id="search-ficha" class="search" type="text" placeholder="Buscar por nombre" /></div>
         <div id="fichas-list" class="fichas-list"></div>
       </div>
     </div>
     <script>
       (function(){
         const LIST_KEY = 'fichas-personaje';
-        const SINGLE_KEY = 'ficha-personaje';
         function getList(){
           const raw = localStorage.getItem(LIST_KEY);
           let arr = [];
           try{ arr = JSON.parse(raw||'[]') || []; }catch(e){ arr = []; }
-          if(Array.isArray(arr) && arr.length) return arr;
-          const sraw = localStorage.getItem(SINGLE_KEY);
-          if(sraw){
-            try{
-              const data = JSON.parse(sraw||'{}');
-              return [{ id:'last', createdAt: Date.now(), updatedAt: Date.now(), data, personaje: data['personaje']||'', jugador: data['jugador']||'' }];
-            }catch(e){}
-          }
-          return [];
+          return Array.isArray(arr) ? arr : [];
         }
         function setList(arr){
           localStorage.setItem(LIST_KEY, JSON.stringify(Array.isArray(arr)?arr:[]));
+        }
+        function norm(s){
+          return String(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+        }
+        function getValidList(){
+          const list = getList();
+          const valid = list.filter(it => String(it?.personaje||'').trim().length > 0);
+          if(valid.length !== list.length) setList(valid);
+          return valid;
+        }
+        function showToast(msg){
+          const d = document.createElement('div'); d.className='toast'; d.textContent=String(msg||'');
+          document.body.appendChild(d);
+          setTimeout(()=>{ d.remove(); }, 1800);
         }
         function download(item){
           const blob = new Blob([JSON.stringify(item.data||{},null,2)], {type:'application/json'});
@@ -65,21 +73,26 @@
           document.body.appendChild(a); a.click(); a.remove();
         }
         function removeItem(item){
-          if(item.id === 'last'){
-            localStorage.removeItem(SINGLE_KEY);
-            setList([]);
-            return;
-          }
           const list = getList().filter(it => it.id !== item.id);
           setList(list);
+          showToast('Ficha eliminada');
+        }
+        let searchTerm = '';
+        const searchInput = document.getElementById('search-ficha');
+        if(searchInput){
+          searchInput.addEventListener('input', function(){
+            searchTerm = String(searchInput.value||'');
+            render();
+          });
         }
         function render(){
           const el = document.getElementById('fichas-list');
-          const list = getList();
+          const q = norm(searchTerm);
+          const list = getValidList().filter(it => norm(it.personaje).includes(q) || norm(it.jugador).includes(q));
           el.innerHTML = '';
           if(!list.length){
             const p = document.createElement('p');
-            p.textContent = 'No tienes fichas guardadas aún.';
+            p.textContent = 'No hay fichas guardadas.';
             el.appendChild(p);
             return;
           }
@@ -91,11 +104,12 @@
             left.appendChild(title); left.appendChild(sub);
             const actions = document.createElement('div'); actions.style.display='flex'; actions.style.gap='8px';
             const edit = document.createElement('a'); edit.className='btn'; edit.href='plantillas.html?fichaId=' + encodeURIComponent(it.id); edit.textContent='Editar';
+            const view = document.createElement('a'); view.className='btn'; view.href='plantillas.html?fichaId=' + encodeURIComponent(it.id) + '&view=1'; view.textContent='Ver';
             const dl = document.createElement('button'); dl.className='btn'; dl.type='button'; dl.textContent='Descargar';
             dl.addEventListener('click', function(){ download(it); });
             const del = document.createElement('button'); del.className='btn'; del.type='button'; del.textContent='Eliminar';
             del.addEventListener('click', function(){ removeItem(it); render(); });
-            actions.appendChild(edit); actions.appendChild(dl); actions.appendChild(del);
+            actions.appendChild(edit); actions.appendChild(view); actions.appendChild(dl); actions.appendChild(del);
             row.appendChild(left); row.appendChild(actions);
             el.appendChild(row);
           }
