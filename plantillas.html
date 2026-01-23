@@ -89,9 +89,9 @@
             <div class="grid-2">
               <div>
                 <label for="rango-slider">Rango</label>
-                <input id="rango-slider" name="rango-slider" type="range" min="1" max="10" step="1" value="1" aria-describedby="rango-slider-hint" />
-                <div id="rango-slider-hint" class="hint">Selecciona un valor de 1 a 10</div>
-                <div class="inline"><span id="rango-valor">1</span></div>
+                <input id="rango-slider" name="rango-slider" type="range" min="0" max="10" step="1" value="0" aria-describedby="rango-slider-hint" />
+                <div id="rango-slider-hint" class="hint">Selecciona un valor de 0 a 10</div>
+                <div class="inline"><span id="rango-valor">0</span></div>
               </div>
               <div>
                 <label for="rango-gremio">Gremio</label>
@@ -115,7 +115,7 @@
             <div class="grid-3">
               <div><label for="alineamiento">Alineamiento</label><input id="alineamiento" name="alineamiento" type="text" placeholder="Ej.: Legal bueno" /></div>
               <div><label for="cabello">Cabello</label><input id="cabello" name="cabello" type="text" placeholder="Descripción" /></div>
-              <div><label for="peso">Peso</label><input id="peso" name="peso" type="number" min="0" placeholder="kg" /></div>
+              <div><label for="peso">Peso</label><input id="peso" name="peso" type="text" placeholder="kg" /></div>
             </div>
             <div class="grid-3">
               <div><label for="sexo">Sexo</label><input id="sexo" name="sexo" type="text" placeholder="Ej.: Femenino" /></div>
@@ -131,14 +131,14 @@
           <fieldset>
             <legend>Características</legend>
             <div class="grid-3">
-              <div class="row"><div><label for="fuerza-score">Fuerza</label><input id="fuerza-score" name="fuerza-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="fuerza-mod">Modificador</label><input id="fuerza-mod" name="fuerza-mod" type="number" readonly /></div></div>
-              <div class="row"><div><label for="destreza-score">Destreza</label><input id="destreza-score" name="destreza-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="destreza-mod">Modificador</label><input id="destreza-mod" name="destreza-mod" type="number" readonly /></div></div>
-              <div class="row"><div><label for="constitucion-score">Constitución</label><input id="constitucion-score" name="constitucion-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="constitucion-mod">Modificador</label><input id="constitucion-mod" name="constitucion-mod" type="number" readonly /></div></div>
+              <div class="row"><div><label for="fuerza-score">Fuerza</label><input id="fuerza-score" name="fuerza-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="fuerza-mod">Modificador</label><input id="fuerza-mod" name="fuerza-mod" type="number" /></div></div>
+              <div class="row"><div><label for="destreza-score">Destreza</label><input id="destreza-score" name="destreza-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="destreza-mod">Modificador</label><input id="destreza-mod" name="destreza-mod" type="number" /></div></div>
+              <div class="row"><div><label for="constitucion-score">Constitución</label><input id="constitucion-score" name="constitucion-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="constitucion-mod">Modificador</label><input id="constitucion-mod" name="constitucion-mod" type="number" /></div></div>
             </div>
             <div class="grid-3">
-              <div class="row"><div><label for="inteligencia-score">Inteligencia</label><input id="inteligencia-score" name="inteligencia-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="inteligencia-mod">Modificador</label><input id="inteligencia-mod" name="inteligencia-mod" type="number" readonly /></div></div>
-              <div class="row"><div><label for="sabiduria-score">Sabiduría</label><input id="sabiduria-score" name="sabiduria-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="sabiduria-mod">Modificador</label><input id="sabiduria-mod" name="sabiduria-mod" type="number" readonly /></div></div>
-              <div class="row"><div><label for="carisma-score">Carisma</label><input id="carisma-score" name="carisma-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="carisma-mod">Modificador</label><input id="carisma-mod" name="carisma-mod" type="number" readonly /></div></div>
+              <div class="row"><div><label for="inteligencia-score">Inteligencia</label><input id="inteligencia-score" name="inteligencia-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="inteligencia-mod">Modificador</label><input id="inteligencia-mod" name="inteligencia-mod" type="number" /></div></div>
+              <div class="row"><div><label for="sabiduria-score">Sabiduría</label><input id="sabiduria-score" name="sabiduria-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="sabiduria-mod">Modificador</label><input id="sabiduria-mod" name="sabiduria-mod" type="number" /></div></div>
+              <div class="row"><div><label for="carisma-score">Carisma</label><input id="carisma-score" name="carisma-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="carisma-mod">Modificador</label><input id="carisma-mod" name="carisma-mod" type="number" /></div></div>
             </div>
           </fieldset>
 
@@ -343,14 +343,7 @@
           localStorage.setItem(LIST_KEY, JSON.stringify(Array.isArray(arr)?arr:[]));
         }
         function calcMod(s){ const n = Number(s); if(!Number.isFinite(n)) return ''; return Math.floor((n - 10) / 2); }
-        function updateMods(){
-          const ids = ['fuerza','destreza','constitucion','inteligencia','sabiduria','carisma'];
-          for(const base of ids){
-            const score = document.getElementById(base + '-score');
-            const mod = document.getElementById(base + '-mod');
-            if(score && mod){ mod.value = calcMod(score.value); }
-          }
-        }
+        function updateMods(){ /* desactivado: modificadores se rellenan manualmente */ }
         function updateRangoValor(){
           const slider = document.getElementById('rango-slider');
           const out = document.getElementById('rango-valor');
