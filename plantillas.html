@@ -42,6 +42,7 @@
       .arma-bloque hr{border:none;border-top:1px solid var(--border);margin:8px 0}
       .preview{width:160px;height:160px;object-fit:cover;border:1px solid var(--border);border-radius:12px;background:#f1f5f9}
       .total{font-weight:800}
+      .invalid{border-color:#ef4444;background:#fee2e2}
       :focus-visible{outline:3px solid #2563eb;outline-offset:2px}
       @media (max-width:900px){ .weapon-row, .weapon-head{grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr} }
       @media (max-width:640px){ .grid-2{grid-template-columns:1fr} .grid-3{grid-template-columns:1fr} .list-6{grid-template-columns:1fr} }
@@ -192,7 +193,10 @@
             <div class="inline" style="margin-top:8px">
               <span class="total">Carga Total</span>
               <input id="carga-total" name="carga-total" type="number" readonly />
+              <span class="total">Carga Máxima</span>
+              <input id="carga-maxima" name="carga-maxima" type="number" min="0" step="0.01" />
             </div>
+            <div id="carga-hint" class="hint"></div>
           </fieldset>
 
           <fieldset>
@@ -353,7 +357,19 @@
           const pesos = form.querySelectorAll('.equipo-peso');
           let total = 0;
           for(const p of pesos){ const v = Number(p.value); if(Number.isFinite(v)) total += v; }
-          const out = document.getElementById('carga-total'); if(out) out.value = Number.isFinite(total) ? Number(total.toFixed(2)) : '';
+          const out = document.getElementById('carga-total');
+          if(out) out.value = Number.isFinite(total) ? Number(total.toFixed(2)) : '';
+          const maxEl = document.getElementById('carga-maxima');
+          const hint = document.getElementById('carga-hint');
+          const btnAdd = document.getElementById('btn-add-equipo');
+          const max = Number(maxEl?.value);
+          const hasMax = Number.isFinite(max) && max > 0;
+          const exceeds = hasMax && Number.isFinite(total) && total > max;
+          if(out){
+            if(exceeds){ out.classList.add('invalid'); } else { out.classList.remove('invalid'); }
+          }
+          if(hint){ hint.textContent = exceeds ? 'Supera la carga máxima' : ''; }
+          if(btnAdd){ btnAdd.disabled = hasMax && Number.isFinite(total) && total >= max; }
         }
         function addDynamicField(containerId, baseName){
           const cont = document.getElementById(containerId);
@@ -681,6 +697,7 @@
           if(/-score$/.test(id)) updateMods();
           if(id.startsWith('eq-peso')) updateCargaTotal();
           if(id === 'rango-slider') updateRangoValor();
+          if(id === 'carga-maxima') updateCargaTotal();
           let m = id.match(/^(magia|elemento|arma-peso|mano)-(\d+)$/);
           if(m) computeAtaque(Number(m[2]));
         });
