@@ -34,7 +34,21 @@
       </div>
       <div class="card" style="margin-top:12px">
         <h2 style="margin:0 0 10px 0">Fichas guardadas</h2>
-        <div style="margin:8px 0"><input id="search-ficha" class="search" type="text" placeholder="Buscar por nombre" /></div>
+        <div style="margin:8px 0; display:grid; grid-template-columns: 1fr auto auto; gap:8px; align-items:center">
+          <input id="search-ficha" class="search" type="text" placeholder="Buscar por nombre" />
+          <select id="order-by" class="btn">
+            <option value="nombre">Nombre</option>
+            <option value="createdAt">Creación</option>
+            <option value="updatedAt">Edición</option>
+          </select>
+          <select id="order-dir" class="btn">
+            <option value="asc">Asc</option>
+            <option value="desc">Desc</option>
+          </select>
+        </div>
+        <div style="margin:8px 0; display:flex; gap:8px; flex-wrap:wrap">
+          <button id="export-all" class="btn" type="button">Exportar todas</button>
+        </div>
         <div id="fichas-list" class="fichas-list"></div>
       </div>
     </div>
@@ -61,6 +75,9 @@
         }
         function showToast(msg){
           const d = document.createElement('div'); d.className='toast'; d.textContent=String(msg||'');
+          d.setAttribute('role','status');
+          d.setAttribute('aria-live','polite');
+          d.setAttribute('aria-atomic','true');
           document.body.appendChild(d);
           setTimeout(()=>{ d.remove(); }, 1800);
         }
@@ -72,12 +89,40 @@
           a.download = name + '.json';
           document.body.appendChild(a); a.click(); a.remove();
         }
+        function exportAll(){
+          const list = getValidList();
+          const payload = list.map(it => ({ id: it.id, personaje: it.personaje, jugador: it.jugador, createdAt: it.createdAt, updatedAt: it.updatedAt, data: it.data }));
+          const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = 'fichas-personaje.json';
+          document.body.appendChild(a); a.click(); a.remove();
+          showToast('Exportadas todas las fichas');
+        }
         function removeItem(item){
           const list = getList().filter(it => it.id !== item.id);
           setList(list);
           showToast('Ficha eliminada');
         }
+        function duplicateItem(item){
+          const list = getList();
+          const id = 'f-' + Date.now() + '-' + Math.floor(Math.random()*1e6);
+          const nombre = (String(item.personaje||'').trim() || 'Sin nombre') + ' (copia)';
+          const copy = {
+            id,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            personaje: nombre,
+            jugador: item.jugador,
+            data: JSON.parse(JSON.stringify(item.data||{}))
+          };
+          list.push(copy);
+          setList(list);
+          showToast('Ficha duplicada');
+        }
         let searchTerm = '';
+        let orderBy = 'nombre';
+        let orderDir = 'asc';
         const searchInput = document.getElementById('search-ficha');
         if(searchInput){
           searchInput.addEventListener('input', function(){
@@ -85,10 +130,35 @@
             render();
           });
         }
+        const orderBySel = document.getElementById('order-by');
+        const orderDirSel = document.getElementById('order-dir');
+        const exportAllBtn = document.getElementById('export-all');
+        if(orderBySel){ orderBySel.addEventListener('change', function(){ orderBy = orderBySel.value; render(); }); }
+        if(orderDirSel){ orderDirSel.addEventListener('change', function(){ orderDir = orderDirSel.value; render(); }); }
+        if(exportAllBtn){ exportAllBtn.addEventListener('click', exportAll); }
         function render(){
           const el = document.getElementById('fichas-list');
           const q = norm(searchTerm);
-          const list = getValidList().filter(it => norm(it.personaje).includes(q) || norm(it.jugador).includes(q));
+          let list = getValidList().filter(it => norm(it.personaje).includes(q) || norm(it.jugador).includes(q));
+          list = [...list].sort((a,b) => {
+            let va, vb;
+            if(orderBy==='nombre'){
+              va = String(a.personaje||'').toLowerCase();
+              vb = String(b.personaje||'').toLowerCase();
+            } else if(orderBy==='updatedAt'){
+              va = Number(a.updatedAt||0);
+              vb = Number(b.updatedAt||0);
+            } else {
+              va = Number(a.createdAt||0);
+              vb = Number(b.createdAt||0);
+            }
+            if(typeof va === 'number' && typeof vb === 'number'){
+              return (va - vb) * (orderDir==='desc'?-1:1);
+            }
+            if(va < vb) return (orderDir==='desc'?-1:1) * -1;
+            if(va > vb) return (orderDir==='desc'?-1:1) * 1;
+            return 0;
+          });
           el.innerHTML = '';
           if(!list.length){
             const p = document.createElement('p');
@@ -107,9 +177,11 @@
             const view = document.createElement('a'); view.className='btn'; view.href='plantillas.html?fichaId=' + encodeURIComponent(it.id) + '&view=1'; view.textContent='Ver';
             const dl = document.createElement('button'); dl.className='btn'; dl.type='button'; dl.textContent='Descargar';
             dl.addEventListener('click', function(){ download(it); });
+            const dup = document.createElement('button'); dup.className='btn'; dup.type='button'; dup.textContent='Duplicar';
+            dup.addEventListener('click', function(){ duplicateItem(it); render(); });
             const del = document.createElement('button'); del.className='btn'; del.type='button'; del.textContent='Eliminar';
             del.addEventListener('click', function(){ removeItem(it); render(); });
-            actions.appendChild(edit); actions.appendChild(view); actions.appendChild(dl); actions.appendChild(del);
+            actions.appendChild(edit); actions.appendChild(view); actions.appendChild(dl); actions.appendChild(dup); actions.appendChild(del);
             row.appendChild(left); row.appendChild(actions);
             el.appendChild(row);
           }

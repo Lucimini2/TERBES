@@ -46,6 +46,7 @@
       .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:10px 14px;z-index:60;box-shadow:0 8px 20px rgba(0,0,0,.1)}
       .view-mode .form-actions{display:none !important}
       .view-mode #card-header, .view-mode #card-gallery{display:none !important}
+      .view-mode fieldset button{display:none !important}
       :focus-visible{outline:3px solid #2563eb;outline-offset:2px}
       @media (max-width:900px){ .weapon-row, .weapon-head{grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr} }
       @media (max-width:640px){ .grid-2{grid-template-columns:1fr} .grid-3{grid-template-columns:1fr} .list-6{grid-template-columns:1fr} }
@@ -316,16 +317,35 @@
           for(const src of images){
             const fig=document.createElement('figure'); fig.className='img-item';
             const img=document.createElement('img'); img.className='thumb'; img.src=src; img.alt='Imagen';
-            img.addEventListener('click',function(){ viewerImg.src=src; viewer.classList.add('show'); });
+            img.addEventListener('click',function(){
+              viewerImg.src=src;
+              viewerImg.alt='Imagen ampliada';
+              viewer.classList.add('show');
+              viewer.setAttribute('aria-hidden','false');
+            });
             const a=document.createElement('a'); a.className='dl-btn'; a.href=src; a.download=''; a.textContent='Descargar';
             fig.appendChild(img); fig.appendChild(a);
             gallery.appendChild(fig);
           }
         }
         render();
-        viewer.addEventListener('click',function(e){ if(e.target===viewer){ viewer.classList.remove('show'); } });
-        viewerClose.addEventListener('click',function(e){ e.preventDefault(); viewer.classList.remove('show'); });
-        document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ viewer.classList.remove('show'); } });
+        viewer.addEventListener('click',function(e){
+          if(e.target===viewer){
+            viewer.classList.remove('show');
+            viewer.setAttribute('aria-hidden','true');
+          }
+        });
+        viewerClose.addEventListener('click',function(e){
+          e.preventDefault();
+          viewer.classList.remove('show');
+          viewer.setAttribute('aria-hidden','true');
+        });
+        document.addEventListener('keydown',function(e){
+          if(e.key==='Escape'){
+            viewer.classList.remove('show');
+            viewer.setAttribute('aria-hidden','true');
+          }
+        });
       })();
     </script>
     <script>
@@ -357,8 +377,36 @@
         }
         function showToast(msg){
           const d = document.createElement('div'); d.className='toast'; d.textContent=String(msg||'');
+          d.setAttribute('role','status');
+          d.setAttribute('aria-live','polite');
+          d.setAttribute('aria-atomic','true');
           document.body.appendChild(d);
           setTimeout(()=>{ d.remove(); }, 1800);
+        }
+        async function toThumbnail(file, max=160){
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            const url = URL.createObjectURL(file);
+            img.onload = function(){
+              try{
+                const scale = Math.min(max / img.width, max / img.height);
+                const w = Math.max(1, Math.round(img.width * scale));
+                const h = Math.max(1, Math.round(img.height * scale));
+                const c = document.createElement('canvas');
+                c.width = w; c.height = h;
+                const ctx = c.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                const data = c.toDataURL('image/webp', 0.7);
+                URL.revokeObjectURL(url);
+                resolve(data);
+              }catch(e){
+                URL.revokeObjectURL(url);
+                reject(e);
+              }
+            };
+            img.onerror = function(){ URL.revokeObjectURL(url); reject(new Error('No se pudo cargar la imagen')); };
+            img.src = url;
+          });
         }
         function setReadOnlyMode(on){
           const ctrls = form.querySelectorAll('input, select, textarea, button');
@@ -547,9 +595,25 @@
           }
           const retrato = document.getElementById('retrato-preview');
           if (retrato && retrato.src) data['retrato-data'] = retrato.src;
-          localStorage.setItem(KEY, JSON.stringify(data));
           const personaje = data['personaje'] || '';
           const jugador = data['jugador'] || '';
+          if(!String(personaje||'').trim()){
+            const el = document.getElementById('personaje');
+            if(el) el.focus();
+            showToast('Añade el nombre del personaje');
+            return false;
+          }
+          const pesos = form.querySelectorAll('.equipo-peso');
+          let total = 0;
+          for(const p of pesos){ const v = Number(p.value); if(Number.isFinite(v)) total += v; }
+          const maxEl = document.getElementById('carga-maxima');
+          const max = Number(maxEl?.value);
+          const exceeds = Number.isFinite(max) && max > 0 && Number.isFinite(total) && total > max;
+          if(exceeds){
+            showToast('Supera la carga máxima');
+            return false;
+          }
+          localStorage.setItem(KEY, JSON.stringify(data));
           if(!currentFichaId) currentFichaId = genId();
           let list = getList();
           const idx = list.findIndex(it => it && it.id === currentFichaId);
@@ -558,6 +622,7 @@
           if(idx >= 0) list[idx] = item; else list.push(item);
           setList(list);
           updateMods(); updateCargaTotal(); updateRangoValor();
+          return true;
         }
         function applyData(data){
           if(!data) return;
@@ -686,7 +751,10 @@
         const btnDelMascota = document.getElementById('btn-del-mascota');
         const btnDelArma = document.getElementById('btn-del-arma');
         const btnDelEquipo = document.getElementById('btn-del-equipo');
-        if(btnGuardar) btnGuardar.addEventListener('click', function(){ saveToLocal(); showToast('Ficha guardada'); });
+        if(btnGuardar) btnGuardar.addEventListener('click', function(){
+          const ok = saveToLocal();
+          if(ok) showToast('Ficha guardada');
+        });
         if(btnLimpiar) btnLimpiar.addEventListener('click', function(){
           form.reset();
           const retrato = document.getElementById('retrato-preview'); if(retrato) retrato.src = '';
@@ -717,13 +785,11 @@
           retratoFile.addEventListener('change', function(e){
             const f = e.target.files && e.target.files[0];
             if(!f) return;
-            const reader = new FileReader();
-            reader.onload = function(){
+            toThumbnail(f, 160).then((data) => {
               const retrato = document.getElementById('retrato-preview');
-              if(retrato) retrato.src = String(reader.result||'');
+              if(retrato) retrato.src = String(data||'');
               saveToLocal();
-            };
-            reader.readAsDataURL(f);
+            }).catch(()=>{});
           });
         }
         (function initLoad(){
