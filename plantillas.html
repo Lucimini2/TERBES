@@ -22,6 +22,41 @@
       .viewer .v-close{position:absolute;top:20px;left:20px}
       @media (max-width:640px){.gallery{grid-template-columns:1fr 1fr}}
       @media (max-width:420px){.gallery{grid-template-columns:1fr}}
+      .form-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+      fieldset{border:1px solid var(--border);border-radius:12px;padding:12px;margin:12px 0}
+      legend{font-weight:800;padding:0 6px}
+      .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+      .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+      .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+      .row{display:grid;grid-template-columns: 1.4fr .6fr;gap:8px}
+      label{font-weight:600}
+      .hint{color:#6b7280;font-size:.85rem}
+      input, select, textarea{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:#fff;color:#111827}
+      input[type="checkbox"]{width:auto}
+      .inline{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+      .list-6{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+      .weapon-row{display:grid;grid-template-columns: 1.2fr .6fr .4fr .7fr .5fr .5fr .7fr 1fr 1fr;gap:8px}
+      .weapon-head{display:grid;grid-template-columns: 1.2fr .6fr .4fr .7fr .5fr .5fr .7fr 1fr 1fr;gap:8px;font-weight:700;align-items:center}
+      .arma-bloque{border:1px solid var(--border);border-radius:12px;padding:10px;margin:10px 0;background:var(--surface)}
+      .arma-bloque p{margin:6px 0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+      .arma-bloque hr{border:none;border-top:1px solid var(--border);margin:8px 0}
+      .preview{width:160px;height:160px;object-fit:cover;border:1px solid var(--border);border-radius:12px;background:#f1f5f9}
+      .total{font-weight:800}
+      :focus-visible{outline:3px solid #2563eb;outline-offset:2px}
+      @media (max-width:900px){ .weapon-row, .weapon-head{grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr} }
+      @media (max-width:640px){ .grid-2{grid-template-columns:1fr} .grid-3{grid-template-columns:1fr} .list-6{grid-template-columns:1fr} }
+      @media (prefers-color-scheme: dark){
+        :root{ --bg:#0f172a; --surface:#0b1020; --text:#e5e7eb; --border:#334155 }
+        body{background:var(--bg);color:var(--text)}
+        input, select, textarea{background:#0f172a;color:#e5e7eb;border-color:#334155}
+        .hint{color:#94a3b8}
+        .dl-btn{background:#0f172a;color:#e5e7eb}
+      }
+      @media print{
+        .back, .form-actions, .viewer{display:none !important}
+        body{background:#fff;color:#000}
+        input, select, textarea{border:1px solid #000}
+      }
     </style>
   </head>
   <body>
@@ -35,6 +70,226 @@
       <div class="card" style="margin-top:12px">
         <h2 style="margin:0 0 10px 0">Galería</h2>
         <div id="gallery" class="gallery"></div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h2 style="margin:0 0 10px 0">Crea tu ficha de personaje</h2>
+        <form id="ficha-form">
+          <fieldset>
+            <legend>Retrato</legend>
+            <div class="inline">
+              <input id="retrato-file" name="retrato-file" type="file" accept="image/*" aria-describedby="retrato-hint" />
+              <div id="retrato-hint" class="hint">Selecciona una imagen. Se guarda como dataURL.</div>
+            </div>
+            <div style="margin-top:8px">
+              <img id="retrato-preview" class="preview" alt="Vista previa del retrato" />
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Rango</legend>
+            <div class="grid-2">
+              <div>
+                <label for="rango-slider">Rango</label>
+                <input id="rango-slider" name="rango-slider" type="range" min="1" max="10" step="1" value="1" aria-describedby="rango-slider-hint" />
+                <div id="rango-slider-hint" class="hint">Selecciona un valor de 1 a 10</div>
+                <div class="inline"><span id="rango-valor">1</span></div>
+              </div>
+              <div>
+                <label for="rango-gremio">Gremio</label>
+                <input id="rango-gremio" name="rango-gremio" type="text" placeholder="Ej.: Hermanos de Acero" />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Información general</legend>
+            <div class="grid-3">
+              <div><label for="nivel">Nivel</label><input id="nivel" name="nivel" type="number" min="1" placeholder="Ej.: 3" required /></div>
+              <div><label for="personaje">Personaje</label><input id="personaje" name="personaje" type="text" placeholder="Nombre del personaje" required /></div>
+              <div><label for="jugador">Jugador</label><input id="jugador" name="jugador" type="text" placeholder="Tu nombre" required /></div>
+            </div>
+            <div class="grid-3">
+              <div><label for="clase">Clase</label><input id="clase" name="clase" type="text" placeholder="Ej.: Guerrero" required /></div>
+              <div><label for="raza">Raza</label><input id="raza" name="raza" type="text" placeholder="Ej.: Humano" required /></div>
+              <div><label for="altura">Altura</label><input id="altura" name="altura" type="text" placeholder="Ej.: 1,75 m" /></div>
+            </div>
+            <div class="grid-3">
+              <div><label for="alineamiento">Alineamiento</label><input id="alineamiento" name="alineamiento" type="text" placeholder="Ej.: Legal bueno" /></div>
+              <div><label for="cabello">Cabello</label><input id="cabello" name="cabello" type="text" placeholder="Descripción" /></div>
+              <div><label for="peso">Peso</label><input id="peso" name="peso" type="number" min="0" placeholder="kg" /></div>
+            </div>
+            <div class="grid-3">
+              <div><label for="sexo">Sexo</label><input id="sexo" name="sexo" type="text" placeholder="Ej.: Femenino" /></div>
+              <div><label for="ojos">Ojos</label><input id="ojos" name="ojos" type="text" placeholder="Ej.: Verdes" /></div>
+              <div><label for="edad">Edad</label><input id="edad" name="edad" type="number" min="0" placeholder="años" /></div>
+            </div>
+            <div>
+              <label for="marcas">Marcas</label>
+              <textarea id="marcas" name="marcas" rows="3" placeholder="Cicatrices, tatuajes…"></textarea>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Características</legend>
+            <div class="grid-3">
+              <div class="row"><div><label for="fuerza-score">Fuerza</label><input id="fuerza-score" name="fuerza-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="fuerza-mod">Modificador</label><input id="fuerza-mod" name="fuerza-mod" type="number" readonly /></div></div>
+              <div class="row"><div><label for="destreza-score">Destreza</label><input id="destreza-score" name="destreza-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="destreza-mod">Modificador</label><input id="destreza-mod" name="destreza-mod" type="number" readonly /></div></div>
+              <div class="row"><div><label for="constitucion-score">Constitución</label><input id="constitucion-score" name="constitucion-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="constitucion-mod">Modificador</label><input id="constitucion-mod" name="constitucion-mod" type="number" readonly /></div></div>
+            </div>
+            <div class="grid-3">
+              <div class="row"><div><label for="inteligencia-score">Inteligencia</label><input id="inteligencia-score" name="inteligencia-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="inteligencia-mod">Modificador</label><input id="inteligencia-mod" name="inteligencia-mod" type="number" readonly /></div></div>
+              <div class="row"><div><label for="sabiduria-score">Sabiduría</label><input id="sabiduria-score" name="sabiduria-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="sabiduria-mod">Modificador</label><input id="sabiduria-mod" name="sabiduria-mod" type="number" readonly /></div></div>
+              <div class="row"><div><label for="carisma-score">Carisma</label><input id="carisma-score" name="carisma-score" type="number" min="1" max="30" placeholder="Puntuación" /></div><div><label for="carisma-mod">Modificador</label><input id="carisma-mod" name="carisma-mod" type="number" readonly /></div></div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Monturas</legend>
+            <div id="monturas-list" class="list-6">
+              <input id="montura-1" name="montura-1" type="text" placeholder="Montura 1" />
+            </div>
+            <div class="inline" style="margin-top:8px"><button type="button" id="btn-add-montura">Añadir montura</button><button type="button" id="btn-del-montura">Eliminar montura</button></div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Mascotas</legend>
+            <div id="mascotas-list" class="list-6">
+              <input id="mascota-1" name="mascota-1" type="text" placeholder="Mascota 1" />
+            </div>
+            <div class="inline" style="margin-top:8px"><button type="button" id="btn-add-mascota">Añadir mascota</button><button type="button" id="btn-del-mascota">Eliminar mascota</button></div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Tiradas de Salvación</legend>
+            <div class="grid-2">
+              <div><label for="salv-venenos">Venenos y Tóxicos</label><input id="salv-venenos" name="salv-venenos" type="number" min="-10" max="10" placeholder="Bonificador" /></div>
+              <div><label for="salv-magia">Magia y Maldiciones</label><input id="salv-magia" name="salv-magia" type="number" min="-10" max="10" placeholder="Bonificador" /></div>
+              <div><label for="salv-petrificacion">Petrificación, Parálisis y Control Mental</label><input id="salv-petrificacion" name="salv-petrificacion" type="number" min="-10" max="10" placeholder="Bonificador" /></div>
+              <div><label for="salv-quemaduras">Quemaduras y Desangrado</label><input id="salv-quemaduras" name="salv-quemaduras" type="number" min="-10" max="10" placeholder="Bonificador" /></div>
+              <div><label for="salv-sortilegios">Sortilegios, Encantamientos y Trampas</label><input id="salv-sortilegios" name="salv-sortilegios" type="number" min="-10" max="10" placeholder="Bonificador" /></div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Movimiento</legend>
+            <div class="grid-3">
+              <div><label for="mov-base">Base</label><input id="mov-base" name="mov-base" type="number" min="0" placeholder="Casillas" /></div>
+              <div><label for="mov-combate">Combate</label><input id="mov-combate" name="mov-combate" type="number" min="0" placeholder="Casillas" /></div>
+              <div><label for="mov-carrera">Carrera</label><input id="mov-carrera" name="mov-carrera" type="number" min="0" placeholder="Casillas" /></div>
+            </div>
+            <div class="grid-2">
+              <div><label for="mov-carga">Carga</label><input id="mov-carga" name="mov-carga" type="number" min="0" placeholder="Casillas" /></div>
+              <div><label for="mov-huir">Huir</label><input id="mov-huir" name="mov-huir" type="number" min="0" placeholder="Casillas" /></div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Equipo</legend>
+            <div class="hint">Nombre y peso de cada ítem</div>
+            <div id="equipo-list" class="grid-2">
+              <div class="row"><input id="eq-nombre-1" name="eq-nombre-1" type="text" placeholder="Ítem 1" /><input class="equipo-peso" id="eq-peso-1" name="eq-peso-1" type="number" min="0" step="0.01" placeholder="Peso" /></div>
+            </div>
+            <div class="inline" style="margin-top:8px"><button type="button" id="btn-add-equipo">Añadir ítem</button><button type="button" id="btn-del-equipo">Eliminar ítem</button></div>
+            <div class="inline" style="margin-top:8px">
+              <span class="total">Carga Total</span>
+              <input id="carga-total" name="carga-total" type="number" readonly />
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Habilidades Especiales / Raciales</legend>
+            <textarea id="habilidades-especiales" name="habilidades-especiales" rows="4" placeholder="Describe habilidades especiales o raciales"></textarea>
+          </fieldset>
+
+          <fieldset>
+            <legend>Rango de Alcance</legend>
+            <textarea id="rango-alcance" name="rango-alcance" rows="3" placeholder="Indica rangos de alcance"></textarea>
+          </fieldset>
+
+          
+
+          <fieldset>
+            <legend>Armamento</legend>
+            <div class="hint">Hasta 6 armas</div>
+            <div id="armas-list">
+            <div class="arma-bloque">
+              <p><strong>Arma:</strong> <input id="arma-1" name="arma-1" type="text" style="width:200px" /></p>
+              <p><strong>Ataque =</strong> <input id="ataque-1" name="ataque-1" type="number" style="width:60px" readonly />
+                Magia <input id="magia-1" name="magia-1" type="number" style="width:60px" />
+                + Elemento <input id="elemento-1" name="elemento-1" type="number" style="width:60px" />
+                + Peso <input id="arma-peso-1" name="arma-peso-1" type="number" style="width:60px" />
+                + Mano <input id="mano-1" name="mano-1" type="number" style="width:60px" />
+              </p>
+              <p><strong>Daño:</strong> Total <input id="dano-total-1" name="dano-total-1" type="text" style="width:80px" />
+                &nbsp;&nbsp; Especial <input id="especial-1" name="especial-1" type="text" style="width:200px" />
+              </p>
+              <hr>
+            </div>
+            </div>
+            <div class="inline" style="margin-top:8px"><button type="button" id="btn-add-arma">Añadir arma</button><button type="button" id="btn-del-arma">Eliminar arma</button></div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Armadura</legend>
+            <div class="grid-4">
+              <div><label for="arm-ca">C.A.</label><input id="arm-ca" name="arm-ca" type="number" min="0" /></div>
+              <div><label for="arm-cabeza">Cabeza</label><input id="arm-cabeza" name="arm-cabeza" type="text" /></div>
+              <div><label for="arm-pecho">Pecho</label><input id="arm-pecho" name="arm-pecho" type="text" /></div>
+              <div><label for="arm-brazaletes">Brazaletes</label><input id="arm-brazaletes" name="arm-brazaletes" type="text" /></div>
+              <div><label for="arm-piernas">Piernas</label><input id="arm-piernas" name="arm-piernas" type="text" /></div>
+              <div><label for="arm-espalda">Espalda</label><input id="arm-espalda" name="arm-espalda" type="text" /></div>
+              <div><label for="arm-anillo">Anillo</label><input id="arm-anillo" name="arm-anillo" type="text" /></div>
+              <div><label for="arm-escudo">Escudo</label><input id="arm-escudo" name="arm-escudo" type="text" /></div>
+              <div><label for="arm-abalorio">Abalorio</label><input id="arm-abalorio" name="arm-abalorio" type="text" /></div>
+              <div><label for="arm-colgante">Colgante</label><input id="arm-colgante" name="arm-colgante" type="text" /></div>
+              <div><label for="arm-otros">Otros</label><input id="arm-otros" name="arm-otros" type="text" /></div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Vitalidad</legend>
+            <div class="grid-2">
+              <div><label for="vida">Puntos de Vida</label><input id="vida" name="vida" type="number" min="0" /></div>
+              <div><label for="heridas">Heridas</label><textarea id="heridas" name="heridas" rows="3"></textarea></div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Atributos Extra</legend>
+            <textarea id="atributos-extra" name="atributos-extra" rows="3"></textarea>
+          </fieldset>
+
+          <fieldset>
+            <legend>Munición</legend>
+            <textarea id="municion" name="municion" rows="3"></textarea>
+          </fieldset>
+
+          <fieldset>
+            <legend>Tesoro</legend>
+            <div class="grid-4">
+              <div><label for="gemas">Gemas</label><input id="gemas" name="gemas" type="text" /></div>
+              <div><label for="oro">Oro</label><input id="oro" name="oro" type="number" min="0" /></div>
+              <div><label for="plata">Plata</label><input id="plata" name="plata" type="number" min="0" /></div>
+              <div><label for="cobre">Cobre</label><input id="cobre" name="cobre" type="number" min="0" /></div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Experiencia</legend>
+            <div class="grid-2">
+              <div><label for="px">PX</label><input id="px" name="px" type="number" min="0" /></div>
+              <div><label for="nec">NEC</label><input id="nec" name="nec" type="number" min="0" /></div>
+            </div>
+          </fieldset>
+
+          <div class="form-actions">
+            <button type="button" id="btn-guardar">Guardar</button>
+            <button type="button" id="btn-limpiar">Limpiar</button>
+            <button type="button" id="btn-exportar">Exportar JSON</button>
+            <button type="button" id="btn-importar">Importar JSON</button>
+            <input type="file" id="import-file" accept="application/json" style="display:none" />
+            <button type="button" id="btn-descargar">Descargar</button>
+          </div>
+        </form>
       </div>
     </div>
     <div id="viewer" class="viewer" aria-hidden="true">
@@ -65,6 +320,396 @@
         viewer.addEventListener('click',function(e){ if(e.target===viewer){ viewer.classList.remove('show'); } });
         viewerClose.addEventListener('click',function(e){ e.preventDefault(); viewer.classList.remove('show'); });
         document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ viewer.classList.remove('show'); } });
+      })();
+    </script>
+    <script>
+      (function(){
+        const KEY = 'ficha-personaje';
+        const LIST_KEY = 'fichas-personaje';
+        let currentFichaId = null;
+        const form = document.getElementById('ficha-form');
+        if (!form) return;
+        function genId(){
+          try{ if(window.crypto && crypto.randomUUID) return crypto.randomUUID(); }catch(e){}
+          return 'f-' + Date.now() + '-' + Math.floor(Math.random()*1e6);
+        }
+        function getList(){
+          const raw = localStorage.getItem(LIST_KEY);
+          let arr = [];
+          try{ arr = JSON.parse(raw||'[]') || []; }catch(e){ arr = []; }
+          return Array.isArray(arr) ? arr : [];
+        }
+        function setList(arr){
+          localStorage.setItem(LIST_KEY, JSON.stringify(Array.isArray(arr)?arr:[]));
+        }
+        function calcMod(s){ const n = Number(s); if(!Number.isFinite(n)) return ''; return Math.floor((n - 10) / 2); }
+        function updateMods(){
+          const ids = ['fuerza','destreza','constitucion','inteligencia','sabiduria','carisma'];
+          for(const base of ids){
+            const score = document.getElementById(base + '-score');
+            const mod = document.getElementById(base + '-mod');
+            if(score && mod){ mod.value = calcMod(score.value); }
+          }
+        }
+        function updateRangoValor(){
+          const slider = document.getElementById('rango-slider');
+          const out = document.getElementById('rango-valor');
+          if(slider && out){ out.textContent = String(slider.value || ''); }
+        }
+        function updateCargaTotal(){
+          const pesos = form.querySelectorAll('.equipo-peso');
+          let total = 0;
+          for(const p of pesos){ const v = Number(p.value); if(Number.isFinite(v)) total += v; }
+          const out = document.getElementById('carga-total'); if(out) out.value = Number.isFinite(total) ? Number(total.toFixed(2)) : '';
+        }
+        function addDynamicField(containerId, baseName){
+          const cont = document.getElementById(containerId);
+          if(!cont) return null;
+          let maxIndex = 0;
+          const inputs = cont.querySelectorAll('input[id^="'+baseName+'-"]');
+          inputs.forEach(inp => {
+            const m = inp.id.match(/^.+-(\d+)$/);
+            if(m) maxIndex = Math.max(maxIndex, Number(m[1]));
+          });
+          const next = maxIndex + 1;
+          const inp = document.createElement('input');
+          inp.type = 'text';
+          inp.id = baseName + '-' + next;
+          inp.name = baseName + '-' + next;
+          inp.placeholder = (baseName==='montura'?'Montura ':'Mascota ') + next;
+          cont.appendChild(inp);
+          return inp;
+        }
+        function ensureField(containerId, baseName, index){
+          const cont = document.getElementById(containerId);
+          if(!cont) return null;
+          const existing = document.getElementById(baseName + '-' + index);
+          if(existing) return existing;
+          const inp = document.createElement('input');
+          inp.type = 'text';
+          inp.id = baseName + '-' + index;
+          inp.name = baseName + '-' + index;
+          inp.placeholder = (baseName==='montura'?'Montura ':'Mascota ') + index;
+          cont.appendChild(inp);
+          return inp;
+        }
+        function removeLastField(containerId, baseName, minKeep){
+          const cont = document.getElementById(containerId);
+          if(!cont) return;
+          let maxIndex = 0;
+          const inputs = cont.querySelectorAll('input[id^="'+baseName+'-"]');
+          inputs.forEach(inp => {
+            const m = inp.id.match(/^.+-(\d+)$/);
+            if(m) maxIndex = Math.max(maxIndex, Number(m[1]));
+          });
+          if(maxIndex <= (minKeep||0)) return;
+          const last = document.getElementById(baseName + '-' + maxIndex);
+          if(last) cont.removeChild(last);
+        }
+        function addEquipoItem(){
+          const cont = document.getElementById('equipo-list');
+          if(!cont) return null;
+          let maxIndex = 0;
+          const inputs = cont.querySelectorAll('input[id^="eq-nombre-"]');
+          inputs.forEach(inp => {
+            const m = inp.id.match(/^eq-nombre-(\d+)$/);
+            if(m) maxIndex = Math.max(maxIndex, Number(m[1]));
+          });
+          const next = maxIndex + 1;
+          return ensureEquipoItem(next);
+        }
+        function ensureEquipoItem(index){
+          const cont = document.getElementById('equipo-list');
+          if(!cont) return null;
+          if(document.getElementById('eq-nombre-' + index)) return document.getElementById('eq-nombre-' + index).closest('.row');
+          const row = document.createElement('div'); row.className = 'row';
+          const nombre = document.createElement('input'); nombre.type='text'; nombre.id='eq-nombre-'+index; nombre.name='eq-nombre-'+index; nombre.placeholder='Ítem ' + index;
+          const peso = document.createElement('input'); peso.className='equipo-peso'; peso.type='number'; peso.min='0'; peso.step='0.01'; peso.id='eq-peso-'+index; peso.name='eq-peso-'+index; peso.placeholder='Peso';
+          row.appendChild(nombre); row.appendChild(peso);
+          cont.appendChild(row);
+          return row;
+        }
+        function removeLastEquipoItem(minKeep){
+          const cont = document.getElementById('equipo-list');
+          if(!cont) return;
+          let maxIndex = 0;
+          const inputs = cont.querySelectorAll('input[id^="eq-nombre-"]');
+          inputs.forEach(inp => {
+            const m = inp.id.match(/^eq-nombre-(\d+)$/);
+            if(m) maxIndex = Math.max(maxIndex, Number(m[1]));
+          });
+          if(maxIndex <= (minKeep||0)) return;
+          const input = document.getElementById('eq-nombre-' + maxIndex);
+          const row = input && input.closest('.row');
+          if(row && row.parentNode===cont) cont.removeChild(row);
+          updateCargaTotal();
+        }
+        function addWeaponRow(){
+          const cont = document.getElementById('armas-list');
+          if(!cont) return null;
+          let maxIndex = 0;
+          const inputs = cont.querySelectorAll('input[id^="arma-"]');
+          inputs.forEach(inp => {
+            const m = inp.id.match(/^arma-(\d+)$/);
+            if(m) maxIndex = Math.max(maxIndex, Number(m[1]));
+          });
+          const idx = maxIndex + 1;
+          return ensureWeaponRow(idx);
+        }
+        function ensureWeaponRow(idx){
+          const cont = document.getElementById('armas-list');
+          if(!cont) return null;
+          if(document.getElementById('arma-' + idx)) return document.getElementById('arma-' + idx).closest('.arma-bloque');
+          const block = document.createElement('div'); block.className = 'arma-bloque';
+          const p1 = document.createElement('p');
+          const p2 = document.createElement('p');
+          const p3 = document.createElement('p');
+          const hr = document.createElement('hr');
+          const s1 = document.createElement('strong'); s1.textContent = 'Arma:';
+          const arma = document.createElement('input'); arma.type='text'; arma.id='arma-'+idx; arma.name='arma-'+idx; arma.style.width='200px';
+          p1.appendChild(s1); p1.appendChild(document.createTextNode(' ')); p1.appendChild(arma);
+          const s2 = document.createElement('strong'); s2.textContent = 'Ataque =';
+          const ataque = document.createElement('input'); ataque.type='number'; ataque.id='ataque-'+idx; ataque.name='ataque-'+idx; ataque.style.width='60px'; ataque.readOnly=true;
+          const magiaTxt = document.createTextNode(' Magia ');
+          const magia = document.createElement('input'); magia.type='number'; magia.id='magia-'+idx; magia.name='magia-'+idx; magia.style.width='60px';
+          const elemTxt = document.createTextNode(' + Elemento ');
+          const elemento = document.createElement('input'); elemento.type='number'; elemento.id='elemento-'+idx; elemento.name='elemento-'+idx; elemento.style.width='60px';
+          const pesoTxt = document.createTextNode(' + Peso ');
+          const peso = document.createElement('input'); peso.type='number'; peso.id='arma-peso-'+idx; peso.name='arma-peso-'+idx; peso.style.width='60px';
+          const manoTxt = document.createTextNode(' + Mano ');
+          const mano = document.createElement('input'); mano.type='number'; mano.id='mano-'+idx; mano.name='mano-'+idx; mano.style.width='60px';
+          p2.appendChild(s2); p2.appendChild(document.createTextNode(' ')); p2.appendChild(ataque);
+          p2.appendChild(magiaTxt); p2.appendChild(magia);
+          p2.appendChild(elemTxt); p2.appendChild(elemento);
+          p2.appendChild(pesoTxt); p2.appendChild(peso);
+          p2.appendChild(manoTxt); p2.appendChild(mano);
+          const s3 = document.createElement('strong'); s3.textContent = 'Daño:';
+          const totalTxt = document.createTextNode(' Total ');
+          const dano = document.createElement('input'); dano.type='text'; dano.id='dano-total-'+idx; dano.name='dano-total-'+idx; dano.style.width='80px';
+          const espSep = document.createTextNode('  ');
+          const espTxt = document.createTextNode(' Especial ');
+          const especial = document.createElement('input'); especial.type='text'; especial.id='especial-'+idx; especial.name='especial-'+idx; especial.style.width='200px';
+          p3.appendChild(s3); p3.appendChild(totalTxt); p3.appendChild(dano); p3.appendChild(espSep); p3.appendChild(espTxt); p3.appendChild(especial);
+          block.appendChild(p1); block.appendChild(p2); block.appendChild(p3); block.appendChild(hr);
+          cont.appendChild(block);
+          return block;
+        }
+        function removeLastWeapon(minKeep){
+          const cont = document.getElementById('armas-list');
+          if(!cont) return;
+          let maxIndex = 0;
+          const inputs = cont.querySelectorAll('input[id^="arma-"]');
+          inputs.forEach(inp => {
+            const m = inp.id.match(/^arma-(\d+)$/);
+            if(m) maxIndex = Math.max(maxIndex, Number(m[1]));
+          });
+          if(maxIndex <= (minKeep||0)) return;
+          const input = document.getElementById('arma-' + maxIndex);
+          const block = input && input.closest('.arma-bloque');
+          if(block && block.parentNode===cont) cont.removeChild(block);
+        }
+        function computeAtaque(idx){
+          const m = Number(document.getElementById('magia-'+idx)?.value || 0);
+          const e = Number(document.getElementById('elemento-'+idx)?.value || 0);
+          const p = Number(document.getElementById('arma-peso-'+idx)?.value || 0);
+          const mano = Number(document.getElementById('mano-'+idx)?.value || 0);
+          const out = document.getElementById('ataque-'+idx);
+          if(out) out.value = m + e + p + mano;
+        }
+        function saveToLocal(){
+          const data = {};
+          const els = form.querySelectorAll('input, select, textarea');
+          for(const el of els){
+            if(!el.id) continue;
+            if(el.type === 'checkbox'){ data[el.id] = !!el.checked; }
+            else if(el.type === 'file'){ /* omit, handled by retrato */ }
+            else { data[el.id] = el.value; }
+          }
+          const retrato = document.getElementById('retrato-preview');
+          if (retrato && retrato.src) data['retrato-data'] = retrato.src;
+          localStorage.setItem(KEY, JSON.stringify(data));
+          const personaje = data['personaje'] || '';
+          const jugador = data['jugador'] || '';
+          if(!currentFichaId) currentFichaId = genId();
+          let list = getList();
+          const idx = list.findIndex(it => it && it.id === currentFichaId);
+          const createdAt = idx >= 0 ? (list[idx].createdAt || Date.now()) : Date.now();
+          const item = { id: currentFichaId, createdAt, updatedAt: Date.now(), data, personaje, jugador };
+          if(idx >= 0) list[idx] = item; else list.push(item);
+          setList(list);
+          updateMods(); updateCargaTotal(); updateRangoValor();
+        }
+        function applyData(data){
+          if(!data) return;
+          for(const id of Object.keys(data)){
+            const m = id.match(/^(arma|ataque|magia|elemento|arma-peso|mano|dano-total|especial)-(\d+)$/);
+            if(m){ ensureWeaponRow(Number(m[2])); }
+            const e = id.match(/^eq-(nombre|peso)-(\d+)$/);
+            if(e){ ensureEquipoItem(Number(e[2])); }
+          }
+          const els = form.querySelectorAll('input, select, textarea');
+          for(const el of els){
+            if(!el.id) continue;
+            if(!(el.id in data)) continue;
+            if(el.type === 'checkbox'){ el.checked = !!data[el.id]; }
+            else if(el.type === 'file'){ /* skip */ }
+            else { el.value = data[el.id] ?? ''; }
+          }
+          if (data['retrato-data']){
+            const retrato = document.getElementById('retrato-preview');
+            if (retrato) retrato.src = data['retrato-data'];
+          }
+          if (data['estatura']){
+            const alturaEl = document.getElementById('altura');
+            if (alturaEl && !alturaEl.value) alturaEl.value = data['estatura'];
+          }
+          for(const [id,val] of Object.entries(data)){
+            if(/^montura-(\d+)$/.test(id)){
+              const m = id.match(/^montura-(\d+)$/);
+              const idx = Number(m[1]);
+              const el = ensureField('monturas-list','montura', idx);
+              if(el) el.value = val ?? '';
+            } else if(/^mascota-(\d+)$/.test(id)){
+              const m = id.match(/^mascota-(\d+)$/);
+              const idx = Number(m[1]);
+              const el = ensureField('mascotas-list','mascota', idx);
+              if(el) el.value = val ?? '';
+            }
+          }
+          const armas = document.querySelectorAll('#armas-list input[id^="arma-"]');
+          armas.forEach(inp => {
+            const m = inp.id.match(/^arma-(\d+)$/);
+            if(m) computeAtaque(Number(m[1]));
+          });
+          updateMods(); updateCargaTotal(); updateRangoValor();
+        }
+        function loadFromLocal(){
+          const raw = localStorage.getItem(KEY);
+          if(!raw) return;
+          let data = null; try{ data = JSON.parse(raw); }catch(e){ data=null; }
+          if(!data) return;
+          applyData(data);
+        }
+        function loadFromListById(id){
+          currentFichaId = id;
+          const raw = localStorage.getItem(LIST_KEY);
+          let arr = [];
+          try{ arr = JSON.parse(raw||'[]') || []; }catch(e){ arr = []; }
+          if(!Array.isArray(arr)) return;
+          const item = arr.find(it => it && it.id === id);
+          if(!item || !item.data) return;
+          applyData(item.data);
+        }
+        function exportJSON(){
+          const els = form.querySelectorAll('input, select, textarea');
+          const data = {};
+          for(const el of els){
+            if(!el.id) continue;
+            if(el.type === 'checkbox'){ data[el.id] = !!el.checked; }
+            else if(el.type === 'file'){ /* skip */ }
+            else { data[el.id] = el.value; }
+          }
+          const retrato = document.getElementById('retrato-preview');
+          if (retrato && retrato.src) data['retrato-data'] = retrato.src;
+          const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = 'ficha-personaje.json';
+          document.body.appendChild(a); a.click(); a.remove();
+        }
+        function importJSON(file){
+          const reader = new FileReader();
+          reader.onload = function(){
+            try{
+              const data = JSON.parse(String(reader.result||'{}'));
+              for(const [id,val] of Object.entries(data)){
+                const m = id.match(/^(arma|ataque|magia|elemento|arma-peso|mano|dano-total|especial)-(\d+)$/);
+                if(m){ ensureWeaponRow(Number(m[2])); }
+                const e = id.match(/^eq-(nombre|peso)-(\d+)$/);
+                if(e){ ensureEquipoItem(Number(e[2])); }
+                const el = document.getElementById(id);
+                if(!el) continue;
+                if(el.type === 'checkbox'){ el.checked = !!val; }
+                else if(el.type === 'file'){ /* skip */ }
+                else { el.value = val ?? ''; }
+              }
+              if (data['retrato-data']){
+                const retrato = document.getElementById('retrato-preview');
+                if (retrato) retrato.src = data['retrato-data'];
+              }
+              const armas = document.querySelectorAll('#armas-list input[id^="arma-"]');
+              armas.forEach(inp => {
+                const m = inp.id.match(/^arma-(\d+)$/);
+                if(m) computeAtaque(Number(m[1]));
+              });
+              updateMods(); updateCargaTotal();
+              saveToLocal();
+            }catch(e){}
+          };
+          reader.readAsText(file);
+        }
+        const fileImport = document.getElementById('import-file');
+        const btnImport = document.getElementById('btn-importar');
+        if(btnImport && fileImport){
+          btnImport.addEventListener('click', function(){ fileImport.click(); });
+          fileImport.addEventListener('change', function(e){ const f=e.target.files && e.target.files[0]; if(f) importJSON(f); });
+        }
+        const btnGuardar = document.getElementById('btn-guardar');
+        const btnLimpiar = document.getElementById('btn-limpiar');
+        const btnExportar = document.getElementById('btn-exportar');
+        const btnDescargar = document.getElementById('btn-descargar');
+        const btnAddMontura = document.getElementById('btn-add-montura');
+        const btnAddMascota = document.getElementById('btn-add-mascota');
+        const btnAddArma = document.getElementById('btn-add-arma');
+        const btnAddEquipo = document.getElementById('btn-add-equipo');
+        const btnDelMontura = document.getElementById('btn-del-montura');
+        const btnDelMascota = document.getElementById('btn-del-mascota');
+        const btnDelArma = document.getElementById('btn-del-arma');
+        const btnDelEquipo = document.getElementById('btn-del-equipo');
+        if(btnGuardar) btnGuardar.addEventListener('click', saveToLocal);
+        if(btnLimpiar) btnLimpiar.addEventListener('click', function(){
+          form.reset();
+          const retrato = document.getElementById('retrato-preview'); if(retrato) retrato.src = '';
+          localStorage.removeItem(KEY);
+          updateMods(); updateCargaTotal();
+        });
+        if(btnExportar) btnExportar.addEventListener('click', exportJSON);
+        if(btnDescargar) btnDescargar.addEventListener('click', exportJSON);
+        if(btnAddMontura) btnAddMontura.addEventListener('click', function(){ addDynamicField('monturas-list','montura'); });
+        if(btnAddMascota) btnAddMascota.addEventListener('click', function(){ addDynamicField('mascotas-list','mascota'); });
+        if(btnAddArma) btnAddArma.addEventListener('click', function(){ addWeaponRow(); });
+        if(btnAddEquipo) btnAddEquipo.addEventListener('click', function(){ addEquipoItem(); updateCargaTotal(); });
+        if(btnDelMontura) btnDelMontura.addEventListener('click', function(){ removeLastField('monturas-list','montura',1); });
+        if(btnDelMascota) btnDelMascota.addEventListener('click', function(){ removeLastField('mascotas-list','mascota',1); });
+        if(btnDelArma) btnDelArma.addEventListener('click', function(){ removeLastWeapon(1); });
+        if(btnDelEquipo) btnDelEquipo.addEventListener('click', function(){ removeLastEquipoItem(1); });
+        form.addEventListener('input', function(e){
+          const id = e.target && e.target.id || '';
+          if(/-score$/.test(id)) updateMods();
+          if(id.startsWith('eq-peso')) updateCargaTotal();
+          if(id === 'rango-slider') updateRangoValor();
+          let m = id.match(/^(magia|elemento|arma-peso|mano)-(\d+)$/);
+          if(m) computeAtaque(Number(m[2]));
+        });
+        const retratoFile = document.getElementById('retrato-file');
+        if(retratoFile){
+          retratoFile.addEventListener('change', function(e){
+            const f = e.target.files && e.target.files[0];
+            if(!f) return;
+            const reader = new FileReader();
+            reader.onload = function(){
+              const retrato = document.getElementById('retrato-preview');
+              if(retrato) retrato.src = String(reader.result||'');
+              saveToLocal();
+            };
+            reader.readAsDataURL(f);
+          });
+        }
+        (function initLoad(){
+          const params = new URLSearchParams(location.search);
+          const fid = params.get('fichaId');
+          if(fid) loadFromListById(fid); else loadFromLocal();
+        })();
       })();
     </script>
   </body>
